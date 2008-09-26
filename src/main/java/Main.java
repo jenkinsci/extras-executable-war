@@ -28,6 +28,7 @@ public class Main {
         System.setProperty("java.awt.headless","true");
 
         File me = whoAmI();
+        System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
         // locate Winstone jar
         URL jar = Main.class.getResource("winstone.jar");
