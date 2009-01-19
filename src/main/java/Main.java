@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,6 +25,21 @@ import java.util.Iterator;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
+        // if the output should be redirect to a file, do it now
+        for (int i = 0; i < args.length-1; i++) {
+            if(args[i].startsWith("--logfile=")) {
+                LogFileOutputStream los = new LogFileOutputStream(new File(args[i].substring("--logfile=".length())));
+                PrintStream ps = new PrintStream(los);
+                System.setOut(ps);
+                System.setErr(ps);
+                // don't let winstone see this
+                List _args = new ArrayList(Arrays.asList(args));
+                _args.remove(i);
+                args = (String[]) _args.toArray(new String[_args.size()]);
+                break;
+            }
+        }
+
         // this is so that JFreeChart can work nicely even if we are launched as a daemon
         System.setProperty("java.awt.headless","true");
 
