@@ -26,7 +26,7 @@ import java.util.Iterator;
 public class Main {
     public static void main(String[] args) throws Exception {
         // if the output should be redirect to a file, do it now
-        for (int i = 0; i < args.length-1; i++) {
+        for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
                 LogFileOutputStream los = new LogFileOutputStream(new File(args[i].substring("--logfile=".length())));
                 PrintStream ps = new PrintStream(los);
