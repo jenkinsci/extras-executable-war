@@ -25,6 +25,21 @@ import java.util.Iterator;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
+        // if we need to daemonize, do it first
+        for (int i = 0; i < args.length; i++) {
+            if(args[i].startsWith("--daemon")) {
+                // load the daemonization code
+                ClassLoader cl = new URLClassLoader(new URL[]{
+                    extractFromJar("WEB-INF/lib/jna-3.0.9.jar","jna","jar").toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/akuma-1.1.jar","akuma","jar").toURI().toURL(),
+                });
+                Class daemon = cl.loadClass("com.sun.akuma.Daemon");
+                Method m = daemon.getMethod("all", new Class[]{boolean.class});
+                m.invoke(daemon.newInstance(),new Object[]{Boolean.TRUE});
+            }
+        }
+
+
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
@@ -46,21 +61,8 @@ public class Main {
         File me = whoAmI();
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
-        // locate Winstone jar
-        URL jar = Main.class.getResource("winstone.jar");
-
-        // put this jar in a file system so that we can load jars from there
-        File tmpJar;
-        try {
-            tmpJar = File.createTempFile("winstone", "jar");
-        } catch (IOException e) {
-            String tmpdir = System.getProperty("java.io.tmpdir");
-            IOException x = new IOException("Hudson has failed to create a temporary file in " + tmpdir);
-            x.initCause(e);
-            throw x;
-        }
-        copyStream(jar.openStream(), new FileOutputStream(tmpJar));
-        tmpJar.deleteOnExit();
+        // put winstone jar in a file system so that we can load jars from there
+        File tmpJar = extractFromJar("winstone.jar","winstone","jar");
 
         // clean up any previously extracted copy, since
         // winstone doesn't do so and that causes problems when newer version of Hudson
@@ -114,6 +116,27 @@ public class Main {
             out.write(buf,0,len);
         in.close();
         out.close();
+    }
+
+    /**
+     * Extract a resource from jar, mark it for deletion upon exit, and return its location.
+     */
+    private static File extractFromJar(String resource, String fileName, String suffix) throws IOException {
+        URL res = Main.class.getResource(resource);
+
+        // put this jar in a file system so that we can load jars from there
+        File tmp;
+        try {
+            tmp = File.createTempFile(fileName,suffix);
+        } catch (IOException e) {
+            String tmpdir = System.getProperty("java.io.tmpdir");
+            IOException x = new IOException("Hudson has failed to create a temporary file in " + tmpdir);
+            x.initCause(e);
+            throw x;
+        }
+        copyStream(res.openStream(), new FileOutputStream(tmp));
+        tmp.deleteOnExit();
+        return tmp;
     }
 
     private static void deleteContents(File file) throws IOException {
