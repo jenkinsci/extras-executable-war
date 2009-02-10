@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
+import java.util.jar.Manifest;
 
 /**
  * Launcher class for stand-alone execution of Hudson as
@@ -87,7 +88,7 @@ public class Main {
 
         // override the usage screen
         Field usage = launcher.getField("USAGE");
-        usage.set(null,"Hudson Continuous Integration Engine\n" +
+        usage.set(null,"Hudson Continuous Integration Engine "+getVersion()+"\n" +
                 "Usage: java -jar hudson.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
@@ -137,6 +138,20 @@ public class Main {
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
+    }
+
+    /**
+     * Figures out the version from the manifest.
+     */
+    private static String getVersion() throws IOException {
+        URL res = Main.class.getResource("/META-INF/MANIFEST.MF");
+        if(res!=null) {
+            Manifest manifest = new Manifest(res.openStream());
+            String v = manifest.getMainAttributes().getValue("Implementation-Version");
+            if(v!=null)
+                return v;
+        }
+        return "?";
     }
 
     private static boolean hasWebRoot(List arguments) {
