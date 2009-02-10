@@ -122,6 +122,7 @@ public class Main {
                 "   --simulateModUniqueId    = simulate the apache mod_unique_id function. Default is false\n" +
                 "   --useSavedSessions       = enables session persistence (true/false). Default is false\n" +
                 "   --usage / --help         = show this message\n" +
+                "   --version                = show the version and quit\n" +
                 "   \n" +
                 "Security options:\n" +
                 "   --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class\n" +
@@ -135,6 +136,11 @@ public class Main {
                 "   --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled\n" +
                 "   --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)\n" +
                 "   --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)");
+
+        if(arguments.contains("--version")) {
+            System.out.println(getVersion());
+            return;
+        }
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
