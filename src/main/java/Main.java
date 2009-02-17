@@ -26,6 +26,13 @@ import java.util.jar.Manifest;
  * @author Kohsuke Kawaguchi
  */
 public class Main {
+    private static boolean hasLogOption(String[] args) {
+        for (int i = 0; i < args.length; i++)
+            if(args[i].startsWith("--logfile="))
+                return true;
+        return false;
+    }
+
     public static void main(String[] args) throws Exception {
         // if we need to daemonize, do it first
         for (int i = 0; i < args.length; i++) {
@@ -35,9 +42,19 @@ public class Main {
                     extractFromJar("WEB-INF/lib/jna-3.0.9.jar","jna","jar").toURI().toURL(),
                     extractFromJar("WEB-INF/lib/akuma-1.1.jar","akuma","jar").toURI().toURL(),
                 });
-                Class daemon = cl.loadClass("com.sun.akuma.Daemon");
-                Method m = daemon.getMethod("all", new Class[]{boolean.class});
-                m.invoke(daemon.newInstance(),new Object[]{Boolean.TRUE});
+                Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
+                Object daemon = $daemon.newInstance();
+
+                // tell the user that we'll be starting as a daemon.
+                Method isDaemonized = $daemon.getMethod("isDaemonized", new Class[]{});
+                if(!((Boolean)isDaemonized.invoke(daemon,new Object[0])).booleanValue()) {
+                    System.out.println("Forking into background to run as a daemon.");
+                    if(!hasLogOption(args))
+                        System.out.println("Use --logfile to redirect output to a file");
+                }
+
+                Method m = $daemon.getMethod("all", new Class[]{boolean.class});
+                m.invoke(daemon,new Object[]{Boolean.TRUE});
             }
         }
 
