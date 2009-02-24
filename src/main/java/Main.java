@@ -91,7 +91,7 @@ public class Main {
         tempFile.delete();
 
         // locate the Winstone launcher
-        ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURL()});
+        ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
         Class launcher = cl.loadClass("winstone.Launcher");
         Method mainMethod = launcher.getMethod("main", new Class[]{String[].class});
 
@@ -195,7 +195,7 @@ public class Main {
         // JNLP returns the URL where the jar was originally placed (like http://hudson.dev.java.net/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
-        return new File(((JarURLConnection)classFile.openConnection()).getJarFile().getName());
+        return new File(((JarURLConnection) classFile.openConnection()).getJarFileURL().toURI());
     }
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
