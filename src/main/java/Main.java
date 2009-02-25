@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.JarURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -190,12 +189,25 @@ public class Main {
      * Figures out the URL of <tt>hudson.war</tt>.
      */
     public static File whoAmI() throws IOException, URISyntaxException {
-        URL classFile = Main.class.getClassLoader().getResource("Main.class");
-
         // JNLP returns the URL where the jar was originally placed (like http://hudson.dev.java.net/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
-        return new File(((JarURLConnection) classFile.openConnection()).getJarFileURL().toURI());
+        // There is no apparent way to find where the locally cached copy
+        // of hudson.war/jar is; JDK 6 is too smart. (See HUDSON-2326.)
+        File myself = File.createTempFile("hudson", ".jar");
+        myself.deleteOnExit();
+        InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
+        try {
+            OutputStream os = new FileOutputStream(myself);
+            try {
+                copyStream(is, os);
+            } finally {
+                os.close();
+            }
+        } finally {
+            is.close();
+        }
+        return myself;
     }
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
