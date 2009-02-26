@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -16,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.ZipFile;
 
 /**
  * Launcher class for stand-alone execution of Hudson as
@@ -77,6 +80,7 @@ public class Main {
         System.setProperty("java.awt.headless","true");
 
         File me = whoAmI();
+        System.out.println("Running from: " + me);
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
         // put winstone jar in a file system so that we can load jars from there
@@ -192,8 +196,21 @@ public class Main {
         // JNLP returns the URL where the jar was originally placed (like http://hudson.dev.java.net/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
-        // There is no apparent way to find where the locally cached copy
+        // There is no portable way to find where the locally cached copy
         // of hudson.war/jar is; JDK 6 is too smart. (See HUDSON-2326.)
+        try {
+            URL classFile = Main.class.getClassLoader().getResource("Main.class");
+            JarFile jf = ((JarURLConnection) classFile.openConnection()).getJarFile();
+            try {
+                Field f = ZipFile.class.getDeclaredField("name");
+                f.setAccessible(true);
+                return new File((String) f.get(jf));
+            } finally {
+                jf.close();
+            }
+        } catch (Exception x) {
+            System.err.println("ZipFile.name trick did not work, using fallback: " + x);
+        }
         File myself = File.createTempFile("hudson", ".jar");
         myself.deleteOnExit();
         InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
