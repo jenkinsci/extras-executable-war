@@ -8,7 +8,7 @@
   <groupId>org.jvnet.hudson</groupId>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
-  <version>1.7</version>
+  <version>1.8-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
@@ -20,10 +20,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/executable-war-1.7</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/executable-war-1.7</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/tags/executable-war-1.7</url>
-  </scm>
 </project>
