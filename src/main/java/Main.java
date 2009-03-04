@@ -201,13 +201,9 @@ public class Main {
         try {
             URL classFile = Main.class.getClassLoader().getResource("Main.class");
             JarFile jf = ((JarURLConnection) classFile.openConnection()).getJarFile();
-            try {
-                Field f = ZipFile.class.getDeclaredField("name");
-                f.setAccessible(true);
-                return new File((String) f.get(jf));
-            } finally {
-                jf.close();
-            }
+            Field f = ZipFile.class.getDeclaredField("name");
+            f.setAccessible(true);
+            return new File((String) f.get(jf));
         } catch (Exception x) {
             System.err.println("ZipFile.name trick did not work, using fallback: " + x);
         }
@@ -232,8 +228,6 @@ public class Main {
         int len;
         while((len=in.read(buf))>0)
             out.write(buf,0,len);
-        in.close();
-        out.close();
     }
 
     /**
@@ -252,7 +246,17 @@ public class Main {
             x.initCause(e);
             throw x;
         }
-        copyStream(res.openStream(), new FileOutputStream(tmp));
+        InputStream is = res.openStream();
+        try {
+            OutputStream os = new FileOutputStream(tmp);
+            try {
+                copyStream(is,os);
+            } finally {
+                os.close();
+            }
+        } finally {
+            is.close();
+        }
         tmp.deleteOnExit();
         return tmp;
     }
