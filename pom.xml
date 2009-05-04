@@ -2,7 +2,7 @@
   <parent>
     <artifactId>extras</artifactId>
     <groupId>org.jvnet.hudson</groupId>
-    <version>1.6</version>
+    <version>1.7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jvnet.hudson</groupId>
