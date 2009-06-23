@@ -17,6 +17,12 @@ public class JNLPMain {
             // some user reported that this happens on their JVM: http://d.hatena.ne.jp/tueda_wolf/20080723
         }
 
+        // we use to configure this in the JNLP file, but a recent change in the webstart makes
+        // it very difficult to do this. See http://forums.sun.com/thread.jspa?threadID=5356707
+        // and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6653241
+        if(System.getProperty(PROMINENT_WINDOWS_INSTALLER)==null)
+            System.setProperty(PROMINENT_WINDOWS_INSTALLER,"true");
+
         boolean headlessMode = Boolean.getBoolean("hudson.webstart.headless");
         if (!headlessMode) {
             // launch GUI to display output
@@ -41,4 +47,6 @@ public class JNLPMain {
         } catch (IllegalAccessException e) {
         }
     }
+
+    private static final String PROMINENT_WINDOWS_INSTALLER = "hudson.lifecycle.WindowsInstallerLink.prominent";
 }
