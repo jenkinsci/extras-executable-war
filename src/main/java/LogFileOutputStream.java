@@ -33,15 +33,17 @@ final class LogFileOutputStream extends FilterOutputStream {
         this.file = file;
         out = new FileOutputStream(file,true);
 
-        Signal.handle(new Signal("ALRM"),new SignalHandler() {
-            public void handle(Signal signal) {
-                try {
-                    reopen();
-                } catch (IOException e) {
-                    throw new Error(e); // failed to reopen
+        if(File.pathSeparatorChar==':') {
+            Signal.handle(new Signal("ALRM"),new SignalHandler() {
+                public void handle(Signal signal) {
+                    try {
+                        reopen();
+                    } catch (IOException e) {
+                        throw new Error(e); // failed to reopen
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public synchronized void reopen() throws IOException {
