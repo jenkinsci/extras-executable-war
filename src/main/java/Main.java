@@ -42,7 +42,7 @@ public class Main {
                 // load the daemonization code
                 ClassLoader cl = new URLClassLoader(new URL[]{
                     extractFromJar("WEB-INF/lib/jna-3.0.9.jar","jna","jar").toURI().toURL(),
-                    extractFromJar("WEB-INF/lib/akuma-1.1.jar","akuma","jar").toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/akuma-1.2.jar","akuma","jar").toURI().toURL(),
                 });
                 Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
                 Object daemon = $daemon.newInstance();
