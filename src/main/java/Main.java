@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
@@ -196,10 +197,11 @@ public class Main {
      * Figures out the version from the manifest.
      */
     private static String getVersion() throws IOException {
-        URL res = Main.class.getResource("/META-INF/MANIFEST.MF");
-        if(res!=null) {
+        Enumeration manifests = Main.class.getClassLoader().getResources("/META-INF/MANIFEST.MF");
+        while (manifests.hasMoreElements()) {
+            URL res = (URL)manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
-            String v = manifest.getMainAttributes().getValue("Implementation-Version");
+            String v = manifest.getMainAttributes().getValue("Hudson-Version");
             if(v!=null)
                 return v;
         }
