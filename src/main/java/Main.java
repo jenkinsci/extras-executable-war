@@ -110,6 +110,19 @@ public class Main {
         System.out.println("Running from: " + me);
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
+        // figure out the arguments
+        List arguments = new ArrayList(Arrays.asList(args));
+        arguments.add(0,"--warfile="+ me.getAbsolutePath());
+        if(!hasWebRoot(arguments))
+            // defaults to ~/.hudson/war since many users reported that cron job attempts to clean up
+            // the contents in the temporary directory.
+            arguments.add("--webroot="+new File(getHomeDir(),"war"));
+
+        if(arguments.contains("--version")) {
+            System.out.println(getVersion("?"));
+            return;
+        }
+
         // put winstone jar in a file system so that we can load jars from there
         File tmpJar = extractFromJar("winstone.jar","winstone","jar");
 
@@ -125,17 +138,9 @@ public class Main {
         Class launcher = cl.loadClass("winstone.Launcher");
         Method mainMethod = launcher.getMethod("main", new Class[]{String[].class});
 
-        // figure out the arguments
-        List arguments = new ArrayList(Arrays.asList(args));
-        arguments.add(0,"--warfile="+ me.getAbsolutePath());
-        if(!hasWebRoot(arguments))
-            // defaults to ~/.hudson/war since many users reported that cron job attempts to clean up
-            // the contents in the temporary directory.
-            arguments.add("--webroot="+new File(getHomeDir(),"war"));
-
         // override the usage screen
         Field usage = launcher.getField("USAGE");
-        usage.set(null,"Hudson Continuous Integration Engine "+getVersion()+"\n" +
+        usage.set(null,"Hudson Continuous Integration Engine "+getVersion("")+"\n" +
                 "Usage: java -jar hudson.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
@@ -191,11 +196,6 @@ public class Main {
                 "   --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)\n" +
                 "   --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)");
 
-        if(arguments.contains("--version")) {
-            System.out.println(getVersion());
-            return;
-        }
-
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
     }
@@ -203,8 +203,8 @@ public class Main {
     /**
      * Figures out the version from the manifest.
      */
-    private static String getVersion() throws IOException {
-        Enumeration manifests = Main.class.getClassLoader().getResources("/META-INF/MANIFEST.MF");
+    private static String getVersion(String fallback) throws IOException {
+        Enumeration manifests = Main.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
         while (manifests.hasMoreElements()) {
             URL res = (URL)manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
@@ -212,7 +212,7 @@ public class Main {
             if(v!=null)
                 return v;
         }
-        return "?";
+        return fallback;
     }
 
     private static boolean hasWebRoot(List arguments) {
