@@ -113,10 +113,13 @@ public class Main {
         // figure out the arguments
         List arguments = new ArrayList(Arrays.asList(args));
         arguments.add(0,"--warfile="+ me.getAbsolutePath());
-        if(!hasWebRoot(arguments))
+        if(!hasWebRoot(arguments)) {
             // defaults to ~/.hudson/war since many users reported that cron job attempts to clean up
             // the contents in the temporary directory.
-            arguments.add("--webroot="+new File(getHomeDir(),"war"));
+            final FileAndDescription describedHomeDir = getHomeDir();
+            System.out.println("webroot: " + describedHomeDir.description);
+            arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
+        }
 
         if(arguments.contains("--version")) {
             System.out.println(getVersion("?"));
@@ -307,41 +310,54 @@ public class Main {
         file.delete();
     }
 
+    /** Add some metadata to a File, allowing to trace setup issues */
+    private static class FileAndDescription {
+        File file;
+        String description;
+        public FileAndDescription(File file,String description) {
+            this.file = file;
+            this.description = description;
+        }
+    }
+
     /**
      * Determines the home directory for Hudson.
      *
      * People makes configuration mistakes, so we are trying to be nice
      * with those by doing {@link String#trim()}.
+     *
+     * @return the File alongside with some description to help the user troubleshoot issues
      */
-    private static File getHomeDir() {
+    private static FileAndDescription getHomeDir() {
         // check JNDI for the home directory first
-        try {
-            InitialContext iniCtxt = new InitialContext();
-            Context env = (Context) iniCtxt.lookup("java:comp/env");
-            String value = (String) env.lookup("HUDSON_HOME");
-            if(value!=null && value.trim().length()>0)
-                return new File(value.trim());
-            // look at one more place. See issue #1314
-            value = (String) iniCtxt.lookup("HUDSON_HOME");
-            if(value!=null && value.trim().length()>0)
-                return new File(value.trim());
-        } catch (NamingException e) {
-            // ignore
+        for (String name : HOME_NAMES) {
+            try {
+                InitialContext iniCtxt = new InitialContext();
+                Context env = (Context) iniCtxt.lookup("java:comp/env");
+                String value = (String) env.lookup(name);
+                if(value!=null && value.trim().length()>0)
+                    return new FileAndDescription(new File(value.trim()),"JNDI/java:comp/env/"+name);
+                // look at one more place. See issue #1314
+                value = (String) iniCtxt.lookup(name);
+                if(value!=null && value.trim().length()>0)
+                    return new FileAndDescription(new File(value.trim()),"JNDI/"+name);
+            } catch (NamingException e) {
+                // ignore
+            }
         }
 
-        // finally check the system property
-        String sysProp = System.getProperty("HUDSON_HOME");
-        if(sysProp!=null)
-            return new File(sysProp.trim());
+        // next the system property
+        for (String name : HOME_NAMES) {
+            String sysProp = System.getProperty(name);
+            if(sysProp!=null)
+                return new FileAndDescription(new File(sysProp.trim()),"System.getProperty(\""+name+"\")");
+        }
 
         // look at the env var next
-        try {
-            String env = System.getenv("HUDSON_HOME");
+        for (String name : HOME_NAMES) {
+            String env = System.getenv(name);
             if(env!=null)
-            return new File(env.trim()).getAbsoluteFile();
-        } catch (Throwable _) {
-            // when this code runs on JDK1.4, this method fails
-            // fall through to the next method
+                return new FileAndDescription(new File(env.trim()).getAbsoluteFile(),"EnvVars.masterEnvVars.get(\""+name+"\")");
         }
 
         // otherwise pick a place by ourselves
@@ -354,11 +370,19 @@ public class Main {
                 // Hudson <1.42 used to prefer this before ~/.hudson, so
                 // check the existence and if it's there, use it.
                 // otherwise if this is a new installation, prefer ~/.hudson
-                return ws;
+                return new FileAndDescription(ws,"getServletContext().getRealPath(\"/WEB-INF/workspace\")");
         }
 */
 
         // if for some reason we can't put it within the webapp, use home directory.
-        return new File(new File(System.getProperty("user.home")),".hudson");
+        File legacyHome = new File(new File(System.getProperty("user.home")),".hudson");
+        if (legacyHome.exists()) {
+            return new FileAndDescription(legacyHome,"$user.home/.hudson"); // before rename, this is where it was stored
+        }
+
+        File newHome = new File(new File(System.getProperty("user.home")),".jenkins");
+        return new FileAndDescription(newHome,"$user.home/.jenkins");
     }
+
+    private static final String[] HOME_NAMES = {"JENKINS_HOME","HUDSON_HOME"};
 }
