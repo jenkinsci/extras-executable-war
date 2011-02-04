@@ -330,31 +330,34 @@ public class Main {
      */
     private static FileAndDescription getHomeDir() {
         // check JNDI for the home directory first
-        for (String name : HOME_NAMES) {
+        for (int i = 0; i < HOME_NAMES.length; i++) {
+            String name = HOME_NAMES[i];
             try {
                 InitialContext iniCtxt = new InitialContext();
                 Context env = (Context) iniCtxt.lookup("java:comp/env");
                 String value = (String) env.lookup(name);
-                if(value!=null && value.trim().length()>0)
-                    return new FileAndDescription(new File(value.trim()),"JNDI/java:comp/env/"+name);
+                if (value != null && value.trim().length() > 0)
+                    return new FileAndDescription(new File(value.trim()), "JNDI/java:comp/env/" + name);
                 // look at one more place. See issue #1314
                 value = (String) iniCtxt.lookup(name);
-                if(value!=null && value.trim().length()>0)
-                    return new FileAndDescription(new File(value.trim()),"JNDI/"+name);
+                if (value != null && value.trim().length() > 0)
+                    return new FileAndDescription(new File(value.trim()), "JNDI/" + name);
             } catch (NamingException e) {
                 // ignore
             }
         }
 
         // next the system property
-        for (String name : HOME_NAMES) {
+        for (int i = 0; i < HOME_NAMES.length; i++) {
+            String name = HOME_NAMES[i];
             String sysProp = System.getProperty(name);
             if(sysProp!=null)
                 return new FileAndDescription(new File(sysProp.trim()),"System.getProperty(\""+name+"\")");
         }
 
         // look at the env var next
-        for (String name : HOME_NAMES) {
+        for (int i = 0; i < HOME_NAMES.length; i++) {
+            String name = HOME_NAMES[i];
             String env = System.getenv(name);
             if(env!=null)
                 return new FileAndDescription(new File(env.trim()).getAbsoluteFile(),"EnvVars.masterEnvVars.get(\""+name+"\")");
