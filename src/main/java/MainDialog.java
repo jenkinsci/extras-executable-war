@@ -20,7 +20,7 @@ class MainDialog extends JFrame {
     private final JTextArea textArea = new JTextArea();
 
     public MainDialog() throws HeadlessException, IOException {
-        super("Hudson Console");
+        super("Jenkins Console");
         
         JScrollPane pane = new JScrollPane(textArea);
         pane.setMinimumSize(new Dimension(400,150));
