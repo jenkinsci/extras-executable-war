@@ -57,6 +57,15 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
+        try {
+            _main(args);
+        } catch (UnsupportedClassVersionError e) {
+            System.err.println("Jenkins requires Java5 or later.");
+            e.printStackTrace();
+        }
+    }
+    
+    private static void _main(String[] args) throws Exception {
         // if we need to daemonize, do it first
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--daemon")) {
@@ -356,11 +365,15 @@ public class Main {
         }
 
         // look at the env var next
-        for (int i = 0; i < HOME_NAMES.length; i++) {
-            String name = HOME_NAMES[i];
-            String env = System.getenv(name);
-            if(env!=null)
-                return new FileAndDescription(new File(env.trim()).getAbsoluteFile(),"EnvVars.masterEnvVars.get(\""+name+"\")");
+        try {
+            for (int i = 0; i < HOME_NAMES.length; i++) {
+                String name = HOME_NAMES[i];
+                String env = System.getenv(name);
+                if(env!=null)
+                    return new FileAndDescription(new File(env.trim()).getAbsoluteFile(),"EnvVars.masterEnvVars.get(\""+name+"\")");
+            }
+        } catch (Throwable e) {
+            // this code fails when run on JDK1.4
         }
 
         // otherwise pick a place by ourselves
