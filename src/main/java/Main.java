@@ -192,6 +192,8 @@ public class Main {
                 "   \n" +
                 "   --simulateModUniqueId    = simulate the apache mod_unique_id function. Default is false\n" +
                 "   --useSavedSessions       = enables session persistence (true/false). Default is false\n" +
+                "   --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...\n" +
+                "                              (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)\n" +
                 "   --usage / --help         = show this message\n" +
                 "   --version                = show the version and quit\n" +
                 "   \n" +
