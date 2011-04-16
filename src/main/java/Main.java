@@ -27,7 +27,7 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipFile;
 
 /**
- * Launcher class for stand-alone execution of Hudson as
+ * Launcher class for stand-alone execution of Jenkins as
  * <tt>java -jar jenkins.war</tt>.
  *
  * @author Kohsuke Kawaguchi
@@ -111,7 +111,7 @@ public class Main {
         // this is so that JFreeChart can work nicely even if we are launched as a daemon
         System.setProperty("java.awt.headless","true");
 
-        // tell Hudson that Winstone doesn't support chunked encoding.
+        // tell Jenkins that Winstone doesn't support chunked encoding.
         if(System.getProperty("hudson.diyChunking")==null)
             System.setProperty("hudson.diyChunking","true");
 
@@ -123,7 +123,7 @@ public class Main {
         List arguments = new ArrayList(Arrays.asList(args));
         arguments.add(0,"--warfile="+ me.getAbsolutePath());
         if(!hasWebRoot(arguments)) {
-            // defaults to ~/.hudson/war since many users reported that cron job attempts to clean up
+            // defaults to ~/.jenkins/war since many users reported that cron job attempts to clean up
             // the contents in the temporary directory.
             final FileAndDescription describedHomeDir = getHomeDir();
             System.out.println("webroot: " + describedHomeDir.description);
@@ -139,7 +139,7 @@ public class Main {
         File tmpJar = extractFromJar("winstone.jar","winstone","jar");
 
         // clean up any previously extracted copy, since
-        // winstone doesn't do so and that causes problems when newer version of Hudson
+        // winstone doesn't do so and that causes problems when newer version of Jenkins
         // is deployed.
         File tempFile = File.createTempFile("dummy", "dummy");
         deleteContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
@@ -239,14 +239,14 @@ public class Main {
     }
 
     /**
-     * Figures out the URL of <tt>hudson.war</tt>.
+     * Figures out the URL of <tt>jenkins.war</tt>.
      */
     public static File whoAmI() throws IOException, URISyntaxException {
-        // JNLP returns the URL where the jar was originally placed (like http://hudson.dev.java.net/...)
+        // JNLP returns the URL where the jar was originally placed (like http://jenkins-ci.org/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
         // There is no portable way to find where the locally cached copy
-        // of hudson.war/jar is; JDK 6 is too smart. (See HUDSON-2326.)
+        // of jenkins.war/jar is; JDK 6 is too smart. (See JENKINS-2326.)
         try {
             URL classFile = Main.class.getClassLoader().getResource("Main.class");
             JarFile jf = ((JarURLConnection) classFile.openConnection()).getJarFile();
