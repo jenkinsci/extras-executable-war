@@ -222,7 +222,7 @@ public class Main {
         while (manifests.hasMoreElements()) {
             URL res = (URL)manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
-            String v = manifest.getMainAttributes().getValue("Hudson-Version");
+            String v = manifest.getMainAttributes().getValue("Jenkins-Version");
             if(v!=null)
                 return v;
         }
