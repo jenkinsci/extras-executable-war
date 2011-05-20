@@ -28,7 +28,7 @@ import java.util.zip.ZipFile;
 
 /**
  * Launcher class for stand-alone execution of Hudson as
- * <tt>java -jar hudson.war</tt>.
+ * <tt>java -jar jenkins.war</tt>.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -152,8 +152,8 @@ public class Main {
 
         // override the usage screen
         Field usage = launcher.getField("USAGE");
-        usage.set(null,"Hudson Continuous Integration Engine "+getVersion("")+"\n" +
-                "Usage: java -jar hudson.war [--option=value] [--option=value]\n" +
+        usage.set(null,"Jenkins Continuous Integration Engine "+getVersion("")+"\n" +
+                "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
@@ -222,7 +222,7 @@ public class Main {
         while (manifests.hasMoreElements()) {
             URL res = (URL)manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
-            String v = manifest.getMainAttributes().getValue("Hudson-Version");
+            String v = manifest.getMainAttributes().getValue("Jenkins-Version");
             if(v!=null)
                 return v;
         }
@@ -256,7 +256,7 @@ public class Main {
         } catch (Exception x) {
             System.err.println("ZipFile.name trick did not work, using fallback: " + x);
         }
-        File myself = File.createTempFile("hudson", ".jar");
+        File myself = File.createTempFile("jenkins", ".jar");
         myself.deleteOnExit();
         InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
         try {
@@ -291,7 +291,7 @@ public class Main {
             tmp = File.createTempFile(fileName,suffix);
         } catch (IOException e) {
             String tmpdir = System.getProperty("java.io.tmpdir");
-            IOException x = new IOException("Hudson has failed to create a temporary file in " + tmpdir);
+            IOException x = new IOException("Jenkins has failed to create a temporary file in " + tmpdir);
             x.initCause(e);
             throw x;
         }
@@ -332,7 +332,7 @@ public class Main {
     }
 
     /**
-     * Determines the home directory for Hudson.
+     * Determines the home directory for Jenkins.
      *
      * People makes configuration mistakes, so we are trying to be nice
      * with those by doing {@link String#trim()}.
