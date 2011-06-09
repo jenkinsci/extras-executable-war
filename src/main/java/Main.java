@@ -58,6 +58,16 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         try {
+            String v = System.getProperty("java.class.version");
+            if (v!=null) {
+                try {
+                    if (Float.parseFloat(v)<49.0f)
+                        throw new UnsupportedClassVersionError();
+                } catch (NumberFormatException e) {
+                    // err on the safe side and keep on going
+                }
+            }
+
             _main(args);
         } catch (UnsupportedClassVersionError e) {
             System.err.println("Jenkins requires Java5 or later.");
