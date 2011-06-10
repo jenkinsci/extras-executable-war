@@ -74,7 +74,7 @@ public class Main {
             e.printStackTrace();
         }
     }
-    
+
     private static void _main(String[] args) throws Exception {
         // if we need to daemonize, do it first
         for (int i = 0; i < args.length; i++) {
@@ -294,6 +294,8 @@ public class Main {
      */
     private static File extractFromJar(String resource, String fileName, String suffix) throws IOException {
         URL res = Main.class.getResource(resource);
+        if (res==null)
+            throw new IOException("Unable to find the resource: "+resource);
 
         // put this jar in a file system so that we can load jars from there
         File tmp;
