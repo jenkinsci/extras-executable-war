@@ -9,7 +9,7 @@
   <groupId>org.jenkins-ci</groupId>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
-  <version>1.22-SNAPSHOT</version>
+  <version>1.22</version>
   <build>
     <plugins>
       <plugin>
