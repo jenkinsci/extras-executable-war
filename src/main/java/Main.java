@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipFile;
@@ -243,6 +244,24 @@ public class Main {
                 "   --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled\n" +
                 "   --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)\n" +
                 "   --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)");
+
+        /*
+         Set an unique cookie name.
+
+         As can be seen in discussions like http://stackoverflow.com/questions/1146112/jsessionid-collision-between-two-servers-on-same-ip-but-different-ports
+         and http://stackoverflow.com/questions/1612177/are-http-cookies-port-specific, RFC 2965 says
+         cookies from one port of one host may be sent to a different port of the same host.
+         This means if someone runs multiple Jenkins on different ports of the same host,
+         their sessions get mixed up.
+
+         To fix the problem, use unique session cookie name.
+
+         This change breaks the cluster mode of Winstone, as all nodes in the cluster must share the same session cookie name.
+         Jenkins doesn't support clustered operation anyway, so we need to do this here, and not in Winstone.
+        */
+        Field f = cl.loadClass("winstone.WinstoneSession").getField("SESSION_COOKIE_NAME");
+        f.setAccessible(true);
+        f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
