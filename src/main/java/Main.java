@@ -109,8 +109,8 @@ public class Main {
 
                 // load the daemonization code
                 ClassLoader cl = new URLClassLoader(new URL[]{
-                    extractFromJar("WEB-INF/lib/jna-"+revisions.get("net.java.dev.jna:jna")+".jar","jna","jar").toURI().toURL(),
-                    extractFromJar("WEB-INF/lib/akuma-"+revisions.get("com.sun.akuma:akuma")+".jar","akuma","jar").toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/jna-"+getVersion(revisions, "net.java.dev.jna", "jna") +".jar","jna","jar").toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/akuma-"+getVersion(revisions,"org.kohsuke","akuma")+".jar","akuma","jar").toURI().toURL(),
                 });
                 Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
                 Object daemon = $daemon.newInstance();
@@ -266,6 +266,19 @@ public class Main {
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
+    }
+
+    private static String getVersion(Map revisions, String groupId, String artifactId) {
+        String v = (String)revisions.get(groupId + ":" + artifactId);
+        if (v==null) {
+            // fall back to artifact ID only search, in case the artifact is renamed
+            for (Iterator itr = revisions.keySet().iterator(); itr.hasNext(); ) {
+                String key = (String) itr.next();
+                if (key.endsWith(":"+artifactId))
+                    return v;
+            }
+        }
+        return v;
     }
 
     /**
