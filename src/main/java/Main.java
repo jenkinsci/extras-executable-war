@@ -230,6 +230,8 @@ public class Main {
                 "   --useSavedSessions       = enables session persistence (true/false). Default is false\n" +
                 "   --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...\n" +
                 "                              (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)\n" +
+                "   --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect\n" +
+                "                              against hash DoS attack (oCERT #2011-003). Default is 10000.\n" +
                 "   --usage / --help         = show this message\n" +
                 "   --version                = show the version and quit\n" +
                 "   \n" +
