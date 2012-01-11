@@ -157,6 +157,7 @@ public class Main {
 
         // figure out the arguments
         List arguments = new ArrayList(Arrays.asList(args));
+        trimOffOurOptions(arguments);
         arguments.add(0,"--warfile="+ me.getAbsolutePath());
         if(!hasWebRoot(arguments)) {
             // defaults to ~/.jenkins/war since many users reported that cron job attempts to clean up
@@ -268,6 +269,14 @@ public class Main {
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
+    }
+
+    private static void trimOffOurOptions(List arguments) {
+        for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
+            String arg = (String) itr.next();
+            if (arg.startsWith("--daemon") || arg.startsWith("--logfile"))
+                itr.remove();
+        }
     }
 
     private static String getVersion(Map revisions, String groupId, String artifactId) {
