@@ -93,6 +93,8 @@ public class Main {
                 }
             }
 
+            ColorFormatter.install();
+
             _main(args);
         } catch (UnsupportedClassVersionError e) {
             System.err.println("Jenkins requires Java5 or later, but you are running "+
