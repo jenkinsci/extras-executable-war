@@ -104,6 +104,17 @@ public class Main {
     }
 
     private static void _main(String[] args) throws Exception {
+        File extractedFilesFolder = null;
+        for (int i = 0; i < args.length; i++) {
+            if(args[i].startsWith("--extractedFilesFolder=")) {
+                extractedFilesFolder = new File(args[i].substring("--extractedFilesFolder=".length()));
+                if (!extractedFilesFolder.isDirectory()) {
+                    System.err.println("The extractedFilesFolder value is not a directory. Ignoring.");
+                    extractedFilesFolder = null;
+                }
+            }
+        }
+
         // if we need to daemonize, do it first
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--daemon")) {
@@ -111,8 +122,8 @@ public class Main {
 
                 // load the daemonization code
                 ClassLoader cl = new URLClassLoader(new URL[]{
-                    extractFromJar("WEB-INF/lib/jna-"+getVersion(revisions, "net.java.dev.jna", "jna") +".jar","jna","jar").toURI().toURL(),
-                    extractFromJar("WEB-INF/lib/akuma-"+getVersion(revisions,"org.kohsuke","akuma")+".jar","akuma","jar").toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/jna-"+getVersion(revisions, "net.java.dev.jna", "jna") +".jar","jna","jar", extractedFilesFolder).toURI().toURL(),
+                    extractFromJar("WEB-INF/lib/akuma-"+getVersion(revisions,"org.kohsuke","akuma")+".jar","akuma","jar", extractedFilesFolder).toURI().toURL(),
                 });
                 Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
                 Object daemon = $daemon.newInstance();
@@ -153,7 +164,7 @@ public class Main {
         if(System.getProperty("hudson.diyChunking")==null)
             System.setProperty("hudson.diyChunking","true");
 
-        File me = whoAmI();
+        File me = whoAmI(extractedFilesFolder);
         System.out.println("Running from: " + me);
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
@@ -175,7 +186,7 @@ public class Main {
         }
 
         // put winstone jar in a file system so that we can load jars from there
-        File tmpJar = extractFromJar("winstone.jar","winstone","jar");
+        File tmpJar = extractFromJar("winstone.jar","winstone",".jar", extractedFilesFolder);
 
         // clean up any previously extracted copy, since
         // winstone doesn't do so and that causes problems when newer version of Jenkins
@@ -195,6 +206,7 @@ public class Main {
                 "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
+                "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --config                 = load configuration properties from here. Default is ./winstone.properties\n" +
                 "   --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n" +
@@ -276,7 +288,7 @@ public class Main {
     private static void trimOffOurOptions(List arguments) {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
-            if (arg.startsWith("--daemon") || arg.startsWith("--logfile"))
+            if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder"))
                 itr.remove();
         }
     }
@@ -321,7 +333,7 @@ public class Main {
     /**
      * Figures out the URL of <tt>jenkins.war</tt>.
      */
-    public static File whoAmI() throws IOException, URISyntaxException {
+    public static File whoAmI(File directory) throws IOException, URISyntaxException {
         // JNLP returns the URL where the jar was originally placed (like http://jenkins-ci.org/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
@@ -336,7 +348,7 @@ public class Main {
         } catch (Exception x) {
             System.err.println("ZipFile.name trick did not work, using fallback: " + x);
         }
-        File myself = File.createTempFile("jenkins", ".jar");
+        File myself = File.createTempFile("jenkins", ".jar", directory);
         myself.deleteOnExit();
         InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
         try {
@@ -362,7 +374,7 @@ public class Main {
     /**
      * Extract a resource from jar, mark it for deletion upon exit, and return its location.
      */
-    private static File extractFromJar(String resource, String fileName, String suffix) throws IOException {
+    private static File extractFromJar(String resource, String fileName, String suffix, File directory) throws IOException {
         URL res = Main.class.getResource(resource);
         if (res==null)
             throw new IOException("Unable to find the resource: "+resource); 
@@ -370,9 +382,9 @@ public class Main {
         // put this jar in a file system so that we can load jars from there
         File tmp;
         try {
-            tmp = File.createTempFile(fileName,suffix);
+            tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
-            String tmpdir = System.getProperty("java.io.tmpdir");
+            String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
             IOException x = new IOException("Jenkins has failed to create a temporary file in " + tmpdir);
             x.initCause(e);
             throw x;
