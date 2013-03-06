@@ -217,14 +217,17 @@ public class Main {
                 "   --logThrowingThread      = show the thread that logged the message. Default is false\n" +
                 "   --debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)\n" +
                 "\n" +
+                // from jenkinsci/winstone/src/java/winstone/LocalStrings.properties#Launcher.UsageInstructions
                 "   --httpPort               = set the http listening port. -1 to disable, Default is 8080\n" +
                 "   --httpListenAddress      = set the http listening address. Default is all interfaces\n" +
                 "   --httpDoHostnameLookups  = enable host name lookups on incoming http connections (true/false). Default is false\n" +
+                "   --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 5000)?\n" +
                 "   --httpsPort              = set the https listening port. -1 to disable, Default is disabled\n" +
                 "                              if neither --httpsCertificate nor --httpsKeyStore are specified,\n" +
                 "                              https is run with one-time self-signed certificate.\n" +
                 "   --httpsListenAddress     = set the https listening address. Default is all interfaces\n" +
                 "   --httpsDoHostnameLookups = enable host name lookups on incoming https connections (true/false). Default is false\n" +
+                "   --httpsKeepAliveTimeout   = how long idle HTTPS keep-alive connections are kept around (in ms; default 5000)?\n" +
                 "   --httpsKeyStore          = the location of the SSL KeyStore file.\n" +
                 "   --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null\n" +
                 "   --httpsCertificate       = the location of the PEM-encoded SSL certificate file.\n" +
@@ -233,13 +236,13 @@ public class Main {
                 "   --httpsPrivateKey        = the location of the PEM-encoded SSL private key.\n" +
                 "                              (the one that starts with '-----BEGIN RSA PRIVATE KEY-----')\n" +
                 "   --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509\n" +
-                "   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default is 8009\n" +
+                "   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default is disabled\n" +
                 "   --ajp13ListenAddress     = set the ajp13 listening address. Default is all interfaces\n" +
                 "   --controlPort            = set the shutdown/control port. -1 to disable, Default disabled\n" +
                 "   \n" +
                 "   --handlerCountStartup    = set the no of worker threads to spawn at startup. Default is 5\n" +
-                "   --handlerCountMax        = set the max no of worker threads to allow. Default is 300\n" +
-                "   --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 50\n" +
+                "   --handlerCountMax        = set the max no of worker threads to allow. Default is 40\n" +
+                "   --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 5\n" +
                 "   \n" +
                 "   --simulateModUniqueId    = simulate the apache mod_unique_id function. Default is false\n" +
                 "   --useSavedSessions       = enables session persistence (true/false). Default is false\n" +
