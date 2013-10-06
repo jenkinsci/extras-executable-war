@@ -161,6 +161,7 @@ public class Main {
         System.setProperty("java.awt.headless","true");
 
         // tell Jenkins that Winstone doesn't support chunked encoding.
+        // this is no longer neede for Winstone 2.x
         if(System.getProperty("hudson.diyChunking")==null)
             System.setProperty("hudson.diyChunking","true");
 
@@ -236,6 +237,7 @@ public class Main {
                 "   --httpsPrivateKey        = the location of the PEM-encoded SSL private key.\n" +
                 "                              (the one that starts with '-----BEGIN RSA PRIVATE KEY-----')\n" +
                 "   --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509\n" +
+                "   --spdy                   = Enable SPDY. See http://wiki.eclipse.org/Jetty/Feature/NPN\n" +
                 "   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default is disabled\n" +
                 "   --ajp13ListenAddress     = set the ajp13 listening address. Default is all interfaces\n" +
                 "   --controlPort            = set the shutdown/control port. -1 to disable, Default disabled\n" +
@@ -244,8 +246,7 @@ public class Main {
                 "   --handlerCountMax        = set the max no of worker threads to allow. Default is 40\n" +
                 "   --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 5\n" +
                 "   \n" +
-                "   --simulateModUniqueId    = simulate the apache mod_unique_id function. Default is false\n" +
-                "   --useSavedSessions       = enables session persistence (true/false). Default is false\n" +
+                "   --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes\n"+
                 "   --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...\n" +
                 "                              (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)\n" +
                 "   --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect\n" +
