@@ -280,9 +280,13 @@ public class Main {
          This change breaks the cluster mode of Winstone, as all nodes in the cluster must share the same session cookie name.
          Jenkins doesn't support clustered operation anyway, so we need to do this here, and not in Winstone.
         */
-        Field f = cl.loadClass("winstone.WinstoneSession").getField("SESSION_COOKIE_NAME");
-        f.setAccessible(true);
-        f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
+        try {
+            Field f = cl.loadClass("winstone.WinstoneSession").getField("SESSION_COOKIE_NAME");
+            f.setAccessible(true);
+            f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
+        } catch (ClassNotFoundException e) {
+            // no such class any more in Winstone 2.0
+        }
 
         // run
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
