@@ -86,7 +86,7 @@ public class Main {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
                 try {
-                    if (Float.parseFloat(v)<49.0f)
+                    if (Float.parseFloat(v)<51.0f)
                         throw new UnsupportedClassVersionError(v);
                 } catch (NumberFormatException e) {
                     // err on the safe side and keep on going
@@ -97,7 +97,7 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println("Jenkins requires Java5 or later, but you are running "+
+            System.err.println("Jenkins requires Java7 or later, but you are running "+
                 System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
             e.printStackTrace();
         }
