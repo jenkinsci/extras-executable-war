@@ -104,6 +104,14 @@ public class Main {
     }
 
     private static void _main(String[] args) throws Exception {
+        // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
+        // This makes it easier to grab the version from a script
+        final List arguments = new ArrayList(Arrays.asList(args));
+        if (arguments.contains("--version")) {
+            System.out.println(getVersion("?"));
+            return;
+        }
+
         File extractedFilesFolder = null;
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--extractedFilesFolder=")) {
@@ -170,7 +178,6 @@ public class Main {
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
         // figure out the arguments
-        List arguments = new ArrayList(Arrays.asList(args));
         trimOffOurOptions(arguments);
         arguments.add(0,"--warfile="+ me.getAbsolutePath());
         if(!hasWebRoot(arguments)) {
@@ -179,11 +186,6 @@ public class Main {
             final FileAndDescription describedHomeDir = getHomeDir();
             System.out.println("webroot: " + describedHomeDir.description);
             arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
-        }
-
-        if(arguments.contains("--version")) {
-            System.out.println(getVersion("?"));
-            return;
         }
 
         // put winstone jar in a file system so that we can load jars from there
