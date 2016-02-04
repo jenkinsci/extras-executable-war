@@ -156,6 +156,15 @@ public class Main {
                 break;
             }
         }
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].startsWith("--pluginroot=")) {
+                System.setProperty("hudson.ClassicPluginStrategy.WORK_DIR",
+                        new File(args[i].substring("--pluginroot=".length())).getAbsolutePath());
+                // if specified multiple times, the first one wins
+                break;
+            }
+        }
+
 
         // this is so that JFreeChart can work nicely even if we are launched as a daemon
         System.setProperty("java.awt.headless","true");
@@ -207,6 +216,9 @@ public class Main {
                 "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
+                "   --webroot                = folder where the WAR file is expanded into. Default is ${JENKINS_HOME}/war\n" +
+                "   --pluginroot             = folder where the plugin archives are expanded into. Default is ${JENKINS_HOME}/plugins\n" +
+                "                              (NOTE: this option does not change the directory where the plugin archives are stored)\n" +
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --config                 = load configuration properties from here. Default is ./winstone.properties\n" +
@@ -296,7 +308,8 @@ public class Main {
     private static void trimOffOurOptions(List arguments) {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
-            if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder"))
+            if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
+                    || arg.startsWith("--pluginroot"))
                 itr.remove();
         }
     }
@@ -333,6 +346,15 @@ public class Main {
         for (Iterator itr = arguments.iterator(); itr.hasNext();) {
             String s = (String) itr.next();
             if(s.startsWith("--webroot="))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean hasPluginRoot(List arguments) {
+        for (Iterator itr = arguments.iterator(); itr.hasNext();) {
+            String s = (String) itr.next();
+            if(s.startsWith("--pluginroot="))
                 return true;
         }
         return false;
