@@ -24,15 +24,11 @@ public class ColorFormatter extends SimpleFormatter {
     /**
      * Conservatively installs the color logger.
      *
-     * If we don't run with JDK6, or if the stdin/stdout isn't console, back off.
+     * If the stdin/stdout isn't console, back off.
      */
     public static void install() {
-        try {
-            if (System.class.getMethod("console",new Class[0]).invoke(null,new Object[0])==null)
-                return;
-        } catch (Throwable t) {
+        if (System.console()==null)
             return;
-        }
 
         Handler[] handlers = Logger.getLogger("").getHandlers();
         for (int i = 0; i < handlers.length; i++) {
