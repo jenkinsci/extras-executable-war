@@ -199,6 +199,7 @@ public class Main {
 
         // put winstone jar in a file system so that we can load jars from there
         File tmpJar = extractFromJar("winstone.jar","winstone",".jar", extractedFilesFolder);
+        tmpJar.deleteOnExit();
 
         // clean up any previously extracted copy, since
         // winstone doesn't do so and that causes problems when newer version of Jenkins
