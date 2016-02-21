@@ -239,7 +239,7 @@ public class Main {
             f.setAccessible(true);
             f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
         } catch (ClassNotFoundException e) {
-            // no such class any more in Winstone 2.0
+            // early versions of Winstone 2.x didn't have this
         }
 
         // run
