@@ -58,13 +58,6 @@ import java.util.zip.ZipFile;
  * @author Kohsuke Kawaguchi
  */
 public class Main {
-    private static boolean hasLogOption(String[] args) {
-        for (int i = 0; i < args.length; i++)
-            if(args[i].startsWith("--logfile="))
-                return true;
-        return false;
-    }
-
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
@@ -140,7 +133,7 @@ public class Main {
                 Method isDaemonized = $daemon.getMethod("isDaemonized", new Class[]{});
                 if(!((Boolean)isDaemonized.invoke(daemon,new Object[0])).booleanValue()) {
                     System.out.println("Forking into background to run as a daemon.");
-                    if(!hasLogOption(args))
+                    if(!hasOption(arguments, "--logfile="))
                         System.out.println("Use --logfile to redirect output to a file");
                 }
 
@@ -189,7 +182,7 @@ public class Main {
         // figure out the arguments
         trimOffOurOptions(arguments);
         arguments.add(0,"--warfile="+ me.getAbsolutePath());
-        if(!hasWebRoot(arguments)) {
+        if(!hasOption(arguments, "--webroot=")) {
             // defaults to ~/.jenkins/war since many users reported that cron job attempts to clean up
             // the contents in the temporary directory.
             final FileAndDescription describedHomeDir = getHomeDir();
@@ -345,19 +338,10 @@ public class Main {
         return fallback;
     }
 
-    private static boolean hasWebRoot(List arguments) {
-        for (Iterator itr = arguments.iterator(); itr.hasNext();) {
+    private static boolean hasOption(List args, String prefix) {
+        for (Iterator itr = args.iterator(); itr.hasNext();) {
             String s = (String) itr.next();
-            if(s.startsWith("--webroot="))
-                return true;
-        }
-        return false;
-    }
-
-    private static boolean hasPluginRoot(List arguments) {
-        for (Iterator itr = arguments.iterator(); itr.hasNext();) {
-            String s = (String) itr.next();
-            if(s.startsWith("--pluginroot="))
+            if (s.startsWith(prefix))
                 return true;
         }
         return false;
