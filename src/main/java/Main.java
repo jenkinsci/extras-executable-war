@@ -170,11 +170,6 @@ public class Main {
         // this is so that JFreeChart can work nicely even if we are launched as a daemon
         System.setProperty("java.awt.headless","true");
 
-        // tell Jenkins that Winstone doesn't support chunked encoding.
-        // this is no longer neede for Winstone 2.x
-        if(System.getProperty("hudson.diyChunking")==null)
-            System.setProperty("hudson.diyChunking","true");
-
         File me = whoAmI(extractedFilesFolder);
         System.out.println("Running from: " + me);
         System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
