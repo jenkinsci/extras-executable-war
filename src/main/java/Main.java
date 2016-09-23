@@ -39,6 +39,7 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -194,7 +195,7 @@ public class Main {
         // is deployed.
         File tempFile = File.createTempFile("dummy", "dummy");
         deleteContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
-        tempFile.delete();
+        Files.delete(tempFile.toPath());
 
         // locate the Winstone launcher
         ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
@@ -369,7 +370,7 @@ public class Main {
                     deleteContents(files[i]);
             }
         }
-        file.delete();
+        Files.delete(file.toPath());
     }
 
     /** Add some metadata to a File, allowing to trace setup issues */
