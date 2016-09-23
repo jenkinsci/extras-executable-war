@@ -59,18 +59,27 @@ import java.util.zip.ZipFile;
  * @author Kohsuke Kawaguchi
  */
 public class Main {
+    
+    private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
+    
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
-    private static Map/*<String,String>*/ parseDependencyVersions() throws IOException {
-        Map r = new HashMap();
-        BufferedReader in = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("WEB-INF/classes/dependencies.txt")));
-        String line;
-        while ((line=in.readLine())!=null) {
-            line = line.trim();
-            String[] tokens = line.split(":");
-            if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
-            r.put(tokens[0]+":"+tokens[1],tokens[3]);
+    private static Map<String,String> parseDependencyVersions() throws IOException {
+        
+        final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
+        if (dependenciesInputStream == null) {
+            throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
+        }
+        Map<String,String> r = new HashMap<>();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream))) {
+            String line;
+            while ((line=in.readLine())!=null) {
+                line = line.trim();
+                String[] tokens = line.split(":");
+                if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
+                r.put(tokens[0]+":"+tokens[1],tokens[3]);
+            }
         }
         return r;
     }
