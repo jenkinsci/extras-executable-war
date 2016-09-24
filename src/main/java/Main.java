@@ -76,17 +76,21 @@ public class Main {
             throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
         }
         final Map/*<String,String>*/ r = new HashMap/*<String,String>*/();
-        final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
         try {
-            String line;
-            while ((line=in.readLine())!=null) {
-                line = line.trim();
-                String[] tokens = line.split(":");
-                if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
-                r.put(tokens[0]+":"+tokens[1],tokens[3]);
+            final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
+            try {
+                String line;
+                while ((line=in.readLine())!=null) {
+                    line = line.trim();
+                    String[] tokens = line.split(":");
+                    if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
+                    r.put(tokens[0]+":"+tokens[1],tokens[3]);
+                }
+            } finally {
+                in.close();
             }
         } finally {
-            in.close();
+            dependenciesInputStream.close();
         }
         return r;
     }
