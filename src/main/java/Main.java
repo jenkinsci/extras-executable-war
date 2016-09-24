@@ -69,13 +69,13 @@ public class Main {
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
-    private static Map<String,String> parseDependencyVersions() throws IOException {
+    private static Map/*<String,String>*/ parseDependencyVersions() throws IOException {
         
         final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
         if (dependenciesInputStream == null) {
             throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
         }
-        final Map<String,String> r = new HashMap<String,String>();
+        final Map/*<String,String>*/ r = new HashMap/*<String,String>*/();
         final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
         try {
             String line;
