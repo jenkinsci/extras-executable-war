@@ -39,6 +39,7 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -49,6 +50,8 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
 /**
@@ -58,18 +61,36 @@ import java.util.zip.ZipFile;
  * @author Kohsuke Kawaguchi
  */
 public class Main {
+    
+    private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
+    
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
     private static Map/*<String,String>*/ parseDependencyVersions() throws IOException {
-        Map r = new HashMap();
-        BufferedReader in = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("WEB-INF/classes/dependencies.txt")));
-        String line;
-        while ((line=in.readLine())!=null) {
-            line = line.trim();
-            String[] tokens = line.split(":");
-            if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
-            r.put(tokens[0]+":"+tokens[1],tokens[3]);
+        
+        final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
+        if (dependenciesInputStream == null) {
+            throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
+        }
+        final Map/*<String,String>*/ r = new HashMap/*<String,String>*/();
+        try {
+            final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
+            try {
+                String line;
+                while ((line=in.readLine())!=null) {
+                    line = line.trim();
+                    String[] tokens = line.split(":");
+                    if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
+                    r.put(tokens[0]+":"+tokens[1],tokens[3]);
+                }
+            } finally {
+                in.close();
+            }
+        } finally {
+            dependenciesInputStream.close();
         }
         return r;
     }
@@ -193,9 +214,11 @@ public class Main {
         // winstone doesn't do so and that causes problems when newer version of Jenkins
         // is deployed.
         File tempFile = File.createTempFile("dummy", "dummy");
-        deleteContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
-        tempFile.delete();
-
+        deleteWinstoneTempContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
+        if (!tempFile.delete()) {
+            LOGGER.log(Level.WARNING, "Failed to delete the temporary file {0}", tempFile);
+        }
+                
         // locate the Winstone launcher
         ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
         Class launcher = cl.loadClass("winstone.Launcher");
@@ -361,15 +384,17 @@ public class Main {
         return tmp;
     }
 
-    private static void deleteContents(File file) throws IOException {
+    private static void deleteWinstoneTempContents(File file) throws IOException {
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
                 for (int i = 0; i < files.length; i++)
-                    deleteContents(files[i]);
+                    deleteWinstoneTempContents(files[i]);
             }
         }
-        file.delete();
+        if (!file.delete()) {
+            LOGGER.log(Level.WARNING, "Failed to delete the temporary Winstone file {0}", file);
+        }
     }
 
     /** Add some metadata to a File, allowing to trace setup issues */
