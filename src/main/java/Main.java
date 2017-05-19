@@ -111,7 +111,7 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println("Jenkins requires Java7 or later, but you are running "+
+            System.err.println("Jenkins requires Java 8 or later, but you are running "+
                 System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
             e.printStackTrace();
         }
