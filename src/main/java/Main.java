@@ -67,6 +67,26 @@ public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     
     /**
+     * Sets custom session cookie name.
+     * It may be used to prevent randomization of JSESSIONID cookies and issues like
+     * <a href="https://issues.jenkins-ci.org/browse/JENKINS-25046">JENKINS-25046</a>.
+     * @since TODO
+     */
+    private static final String JSESSIONID_COOKIE_NAME = 
+            System.getProperty("executableWar.jetty.sessionIdCookieName");
+    
+    /**
+     * Disables usage of the custom cookie names when starting the WAR file.
+     * If the flag is specified, the session ID will be defined by the internal Jetty logic.
+     * In such case it becomes configurable via 
+     * <a href="http://www.eclipse.org/jetty/documentation/9.4.x/jetty-xml-config.html">Jetty XML Config file</a>>
+     * or via system properties.
+     * @since TODO
+     */
+    private static final boolean DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME = 
+            Boolean.getBoolean("executableWar.jetty.disableCustomSeesionIdCookieName");
+    
+    /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
     private static Map/*<String,String>*/ parseDependencyVersions() throws IOException {
@@ -238,26 +258,35 @@ public class Main {
                 "   --logfile                = redirect log messages to this file\n" +
                 "{OPTIONS}");
 
-        /*
-         Set an unique cookie name.
+        
+        if (!DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME) {
+            /*
+             Set an unique cookie name.
 
-         As can be seen in discussions like http://stackoverflow.com/questions/1146112/jsessionid-collision-between-two-servers-on-same-ip-but-different-ports
-         and http://stackoverflow.com/questions/1612177/are-http-cookies-port-specific, RFC 2965 says
-         cookies from one port of one host may be sent to a different port of the same host.
-         This means if someone runs multiple Jenkins on different ports of the same host,
-         their sessions get mixed up.
+             As can be seen in discussions like http://stackoverflow.com/questions/1146112/jsessionid-collision-between-two-servers-on-same-ip-but-different-ports
+             and http://stackoverflow.com/questions/1612177/are-http-cookies-port-specific, RFC 2965 says
+             cookies from one port of one host may be sent to a different port of the same host.
+             This means if someone runs multiple Jenkins on different ports of the same host,
+             their sessions get mixed up.
 
-         To fix the problem, use unique session cookie name.
+             To fix the problem, use unique session cookie name.
 
-         This change breaks the cluster mode of Winstone, as all nodes in the cluster must share the same session cookie name.
-         Jenkins doesn't support clustered operation anyway, so we need to do this here, and not in Winstone.
-        */
-        try {
-            Field f = cl.loadClass("winstone.WinstoneSession").getField("SESSION_COOKIE_NAME");
-            f.setAccessible(true);
-            f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
-        } catch (ClassNotFoundException e) {
-            // early versions of Winstone 2.x didn't have this
+             This change breaks the cluster mode of Winstone, as all nodes in the cluster must share the same session cookie name.
+             Jenkins doesn't support clustered operation anyway, so we need to do this here, and not in Winstone.
+            */
+            try {
+                Field f = cl.loadClass("winstone.WinstoneSession").getField("SESSION_COOKIE_NAME");
+                f.setAccessible(true);
+                if (JSESSIONID_COOKIE_NAME != null) {
+                    // Use the user-defined cookie name
+                    f.set(null, JSESSIONID_COOKIE_NAME);
+                } else {
+                    // Randomize session names by default to prevent collisions when running multiple Jenkins instances on the same host.
+                    f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
+                }
+            } catch (ClassNotFoundException e) {
+                // early versions of Winstone 2.x didn't have this
+            }
         }
 
         // run
