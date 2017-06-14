@@ -8,7 +8,7 @@ Release date: June 14, 2017
 * [JENKINS-44764](https://issues.jenkins-ci.org/browse/JENKINS-44764) -
 Executable WAR now checks for Java 8 instead of Java 7 before starting Jenkins
 ([PR #8](https://github.com/jenkinsci/extras-executable-war/pull/8)).
-* [JENKINS-44764](https://issues.jenkins-ci.org/browse/JENKINS-44764) -
+* [JENKINS-44894](https://issues.jenkins-ci.org/browse/JENKINS-44894) -
 Add system properties for managing the Jetty Session ID cookie name
 ([PR #9](https://github.com/jenkinsci/extras-executable-war/pull/9)).
   * Now it is possible to disable random cookie name generation or to specify a custom one
