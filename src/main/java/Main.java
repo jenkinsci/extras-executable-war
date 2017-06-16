@@ -84,7 +84,7 @@ public class Main {
      * @since TODO
      */
     private static final boolean DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME = 
-            Boolean.getBoolean("executableWar.jetty.disableCustomSeesionIdCookieName");
+            Boolean.getBoolean("executableWar.jetty.disableCustomSessionIdCookieName");
     
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.

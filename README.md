@@ -20,14 +20,14 @@ The default lifetime of these cookies is 1 day, hence in some cases you may get 
 
 Starting from version `TODO`, it is possible to customize the behavior via System Properties:
 
-* `executableWar.jetty.disableCustomSeesionIdCookieName` - 
+* `executableWar.jetty.disableCustomSessionIdCookieName` - 
 (`boolean`, default: `false`) -  
 Disables usage of the custom cookie names when starting the WAR file.
 If the flag is specified, the session ID will be defined by the internal Jetty logic.
 In such case it becomes configurable via [Jetty configuration](http://www.eclipse.org/jetty/documentation/9.4.x/quick-start-configure.html) (XML config file, etc.).
 * `executableWar.jetty.sessionIdCookieName` - 
 (`string`, default: `null`) -  
-Sets a custom Session ID Cookie name when `disableCustomSeesionIdCookieName` is `false`.
+Sets a custom Session ID Cookie name when `disableCustomSessionIdCookieName` is `false`.
 In such case the Jenkins administrator is responsible for preventing cookie collisions between Jenkins instances.
 
 
