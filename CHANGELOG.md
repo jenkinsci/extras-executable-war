@@ -1,6 +1,16 @@
 Changelog
 ====
 
+### 1.35.1
+
+Release date: June 16, 2017
+
+Fixed issues:
+
+* [JENKINS-44894](https://issues.jenkins-ci.org/browse/JENKINS-44894) -
+Fix typo in the system property name
+([PR #10](https://github.com/jenkinsci/extras-executable-war/pull/10)).
+
 ### 1.35
 
 Release date: June 14, 2017
