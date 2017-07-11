@@ -89,13 +89,13 @@ public class Main {
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
-    private static Map/*<String,String>*/ parseDependencyVersions() throws IOException {
+    private static Map<String,String> parseDependencyVersions() throws IOException {
         
         final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
         if (dependenciesInputStream == null) {
             throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
         }
-        final Map/*<String,String>*/ r = new HashMap/*<String,String>*/();
+        final Map<String,String> r = new HashMap<>();
         try {
             final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
             try {
@@ -140,7 +140,7 @@ public class Main {
     private static void _main(String[] args) throws Exception {
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
         // This makes it easier to grab the version from a script
-        final List arguments = new ArrayList(Arrays.asList(args));
+        final List<String> arguments = new ArrayList(Arrays.asList(args));
         if (arguments.contains("--version")) {
             System.out.println(getVersion("?"));
             return;
@@ -160,7 +160,7 @@ public class Main {
         // if we need to daemonize, do it first
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--daemon")) {
-                Map revisions = parseDependencyVersions();
+                Map<String, String> revisions = parseDependencyVersions();
 
                 // load the daemonization code
                 ClassLoader cl = new URLClassLoader(new URL[]{
@@ -290,6 +290,7 @@ public class Main {
         }
 
         // run
+        Thread.currentThread().setContextClassLoader( cl );
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
     }
 
