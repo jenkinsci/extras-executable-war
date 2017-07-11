@@ -95,7 +95,7 @@ public class Main {
         if (dependenciesInputStream == null) {
             throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
         }
-        final Map<String,String> r = new HashMap<>();
+        final Map<String,String> r = new HashMap<String,String>();
         try {
             final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
             try {
