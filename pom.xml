@@ -12,7 +12,7 @@
   <version>1.36-SNAPSHOT</version>
 
   <properties>
-    <java.level>3</java.level>
+    <java.level>6</java.level>
   </properties>
 
   <scm>
