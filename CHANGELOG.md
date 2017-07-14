@@ -1,6 +1,14 @@
 Changelog
 ====
 
+### 1.36
+
+Release date: July 14, 2017
+
+* [JENKINS-45438](https://issues.jenkins-ci.org/browse/JENKINS-45438) -
+Set context classloader to enable the ServiceLoader mechanism required for HTTP/2 support
+([PR #11](https://github.com/jenkinsci/extras-executable-war/pull/11)).
+
 ### 1.35.1
 
 Release date: June 16, 2017
