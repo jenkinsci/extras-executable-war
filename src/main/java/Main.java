@@ -227,7 +227,10 @@ public class Main {
             arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
         }
 
-        deleteWinstoneTempContents(extractedFilesFolder,"winstone.*\\.jar");
+        //only do a cleanup if you set the extractedFilesFolder property.
+        if(extractedFilesFolder != null) {
+            deleteWinstoneTempContents(extractedFilesFolder, "winstone.*\\.jar");
+        }
 
         // put winstone jar in a file system so that we can load jars from there
         File tmpJar = extractFromJar("winstone.jar","winstone",".jar", extractedFilesFolder);
