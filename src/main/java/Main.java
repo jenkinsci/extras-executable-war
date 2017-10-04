@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 import javax.naming.Context;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -226,6 +227,8 @@ public class Main {
             arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
         }
 
+        deleteWinstoneTempContents(extractedFilesFolder,"winstone.*\\.jar", "jna-.*");
+
         // put winstone jar in a file system so that we can load jars from there
         File tmpJar = extractFromJar("winstone.jar","winstone",".jar", extractedFilesFolder);
         tmpJar.deleteOnExit();
@@ -412,6 +415,30 @@ public class Main {
         }
         tmp.deleteOnExit();
         return tmp;
+    }
+
+    private static void deleteWinstoneTempContents(File folder, final String...patterns) throws IOException {
+        File tmpdir = folder;
+
+        if(tmpdir == null){
+            tmpdir = new File(System.getProperty("java.io.tmpdir"));
+        }
+
+        final File[] files = tmpdir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                for (String pattern : patterns) {
+                    if(name.matches(pattern)){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        for (File file : files) {
+            LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
+            deleteWinstoneTempContents(file);
+        }
     }
 
     private static void deleteWinstoneTempContents(File file) throws IOException {
