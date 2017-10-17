@@ -311,7 +311,7 @@ public class Main {
         byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
         in.read(buffer);
         return new String(buffer);
-	}
+    }
     private static void trimOffOurOptions(List arguments) {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
