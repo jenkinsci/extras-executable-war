@@ -302,10 +302,10 @@ public class Main {
     /**
      * reads up to maxRead bytes from InputStream if available into a String
      *
-     * @param in
-     * @param maxToRead
-     * @return
-     * @throws IOException
+     * @param in input stream to be read
+     * @param maxToRead maximum number of bytes to read from the in
+     * @return a String read from in
+     * @throws IOException when reading in caused it
      */
     private static String readStringNonBlocking(InputStream in, int maxToRead) throws IOException {
         byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
