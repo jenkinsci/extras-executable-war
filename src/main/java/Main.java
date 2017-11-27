@@ -438,9 +438,11 @@ public class Main {
                 return false;
             }
         });
-        for (File file : files) {
-            LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
-            deleteWinstoneTempContents(file);
+        if(files != null){
+            for (File file : files) {
+                LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
+                deleteWinstoneTempContents(file);
+            }
         }
     }
 
