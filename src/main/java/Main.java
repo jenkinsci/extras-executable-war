@@ -239,7 +239,7 @@ public class Main {
         // winstone doesn't do so and that causes problems when newer version of Jenkins
         // is deployed.
         File tempFile = File.createTempFile("dummy", "dummy");
-        deleteContentsFromFolder(new File(tempFile.getParent(), "winstone/" + me.getName()));
+        deleteWinstoneTempContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
         if (!tempFile.delete()) {
             LOGGER.log(Level.WARNING, "Failed to delete the temporary file {0}", tempFile);
         }
