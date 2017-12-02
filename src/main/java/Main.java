@@ -40,7 +40,6 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -229,7 +228,7 @@ public class Main {
 
         //only do a cleanup if you set the extractedFilesFolder property.
         if(extractedFilesFolder != null) {
-            deleteWinstoneTempContents(extractedFilesFolder, "winstone.*\\.jar");
+            deleteContentsFromFolder(extractedFilesFolder, "winstone.*\\.jar");
         }
 
         // put winstone jar in a file system so that we can load jars from there
@@ -240,7 +239,7 @@ public class Main {
         // winstone doesn't do so and that causes problems when newer version of Jenkins
         // is deployed.
         File tempFile = File.createTempFile("dummy", "dummy");
-        deleteWinstoneTempContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
+        deleteContentsFromFolder(new File(tempFile.getParent(), "winstone/" + me.getName()));
         if (!tempFile.delete()) {
             LOGGER.log(Level.WARNING, "Failed to delete the temporary file {0}", tempFile);
         }
@@ -420,14 +419,14 @@ public class Main {
         return tmp;
     }
 
-    private static void deleteWinstoneTempContents(File folder, final String...patterns) throws IOException {
-        File tmpdir = folder;
-
-        if(tmpdir == null){
-            tmpdir = new File(System.getProperty("java.io.tmpdir"));
-        }
-
-        final File[] files = tmpdir.listFiles(new FilenameFilter() {
+    /**
+     * Search contents to delete in a folder that match with some patterns.
+     * @param folder folder where the contents are.
+     * @param patterns patterns that identifies the contents to search.
+     * @throws IOException in case of error deleting contents.
+     */
+    private static void deleteContentsFromFolder(File folder, final String...patterns) throws IOException {
+        final File[] files = folder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(final File dir, final String name) {
                 for (String pattern : patterns) {
@@ -438,18 +437,20 @@ public class Main {
                 return false;
             }
         });
-        for (File file : files) {
-            LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
-            deleteWinstoneTempContents(file);
+        if(files != null){
+            for (File file : files) {
+                LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
+                deleteContentsFromFolder(file);
+            }
         }
     }
 
-    private static void deleteWinstoneTempContents(File file) throws IOException {
+    private static void deleteContentsFromFolder(File file) throws IOException {
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
                 for (int i = 0; i < files.length; i++)
-                    deleteWinstoneTempContents(files[i]);
+                    deleteContentsFromFolder(files[i]);
             }
         }
         if (!file.delete()) {
