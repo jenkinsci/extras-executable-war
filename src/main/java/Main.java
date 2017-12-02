@@ -440,17 +440,17 @@ public class Main {
         if(files != null){
             for (File file : files) {
                 LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
-                deleteContentsFromFolder(file);
+                deleteWinstoneTempContents(file);
             }
         }
     }
 
-    private static void deleteContentsFromFolder(File file) throws IOException {
+    private static void deleteWinstoneTempContents(File file) throws IOException {
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
                 for (int i = 0; i < files.length; i++)
-                    deleteContentsFromFolder(files[i]);
+                    deleteWinstoneTempContents(files[i]);
             }
         }
         if (!file.delete()) {
