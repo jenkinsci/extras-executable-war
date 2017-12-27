@@ -426,21 +426,16 @@ public class Main {
      * @throws IOException in case of error deleting contents.
      */
     private static void deleteContentsFromFolder(File folder, final String...patterns) throws IOException {
-        final File[] files = folder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(final File dir, final String name) {
-                for (String pattern : patterns) {
-                    if(name.matches(pattern)){
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        File[]  files = folder.listFiles();
+
         if(files != null){
             for (File file : files) {
-                LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
-                deleteWinstoneTempContents(file);
+                for (String pattern : patterns) {
+                    if(file.getName().matches(pattern)){
+                        LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
+                        deleteWinstoneTempContents(file);
+                    }
+                }
             }
         }
     }
