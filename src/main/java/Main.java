@@ -139,9 +139,14 @@ public class Main {
 
     private static void _main(String[] args) throws Exception {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
-        if(args.length == 0) {
-            String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
-            args = argsInStdIn.split(" +");
+        //to achieve this use --paramsFromStdIn
+        for (String arg:args){
+            if ("--paramsFromStdIn".equals(arg)) {
+                System.out.println("--paramsFromStdIn detected. Parameters are going to be read from stdin. Other parameters passed directly will be ignored.");
+                String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
+                args = argsInStdIn.split(" +");
+                break;
+            }
         }
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
         // This makes it easier to grab the version from a script
