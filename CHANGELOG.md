@@ -1,6 +1,16 @@
 Changelog
 ====
 
+### 1.37
+
+Release date: Jan 08, 2018
+
+* [PR #13](https://github.com/jenkinsci/extras-executable-war/pull/13) - 
+Add ability to supply WAR command-line arguments via STDIN using the `--paramsFromStdIn` parameter
+([Documentation](https://github.com/jenkinsci/extras-executable-war#parameters-from-stdin)).
+* [JENKINS-22088](https://issues.jenkins-ci.org/browse/JENKINS-22088) -
+Prevent the disk space leak due to multiple copies of `winstone-XXXX.jar` in the TEMP folder.
+
 ### 1.36
 
 Release date: July 14, 2017
