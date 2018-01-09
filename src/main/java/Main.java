@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 import javax.naming.Context;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +40,6 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -224,6 +224,11 @@ public class Main {
             final FileAndDescription describedHomeDir = getHomeDir();
             System.out.println("webroot: " + describedHomeDir.description);
             arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
+        }
+
+        //only do a cleanup if you set the extractedFilesFolder property.
+        if(extractedFilesFolder != null) {
+            deleteContentsFromFolder(extractedFilesFolder, "winstone.*\\.jar");
         }
 
         // put winstone jar in a file system so that we can load jars from there
@@ -412,6 +417,27 @@ public class Main {
         }
         tmp.deleteOnExit();
         return tmp;
+    }
+
+    /**
+     * Search contents to delete in a folder that match with some patterns.
+     * @param folder folder where the contents are.
+     * @param patterns patterns that identifies the contents to search.
+     * @throws IOException in case of error deleting contents.
+     */
+    private static void deleteContentsFromFolder(File folder, final String...patterns) throws IOException {
+        File[]  files = folder.listFiles();
+
+        if(files != null){
+            for (File file : files) {
+                for (String pattern : patterns) {
+                    if(file.getName().matches(pattern)){
+                        LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
+                        deleteWinstoneTempContents(file);
+                    }
+                }
+            }
+        }
     }
 
     private static void deleteWinstoneTempContents(File file) throws IOException {
