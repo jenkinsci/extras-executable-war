@@ -30,4 +30,12 @@ In such case it becomes configurable via [Jetty configuration](http://www.eclips
 Sets a custom Session ID Cookie name when `disableCustomSessionIdCookieName` is `false`.
 In such case the Jenkins administrator is responsible for preventing cookie collisions between Jenkins instances.
 
+### Parameters from stdin
+
+When parameters are passed via command line they can be viewed using ps in *nix, process explorer in Windows as long as the process keeps running. This is undesirable when passing sensitive parameters like httpsKeyStorePassword.
+
+It is now possible to pass parameters through stdin. To do this pass '--paramsFromStdIn' parameter and you will be able to replace this:
+`java -jar jenkins.war --httpPort=-1 --httpsPort=443 --httpsKeyStore=path/to/keystore --httpsKeyStorePassword=keystorePassword`
+with this:
+`echo "--httpPort=-1 --httpsPort=443 --httpsKeyStore=path/to/keystore --httpsKeyStorePassword=keystorePassword" | java -jar jenkins.war --paramsFromStdIn`
 

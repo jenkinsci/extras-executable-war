@@ -138,6 +138,16 @@ public class Main {
     }
 
     private static void _main(String[] args) throws Exception {
+        //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
+        //to achieve this use --paramsFromStdIn
+        for (String arg:args){
+            if ("--paramsFromStdIn".equals(arg)) {
+                System.out.println("--paramsFromStdIn detected. Parameters are going to be read from stdin. Other parameters passed directly will be ignored.");
+                String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
+                args = argsInStdIn.split(" +");
+                break;
+            }
+        }
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
         // This makes it easier to grab the version from a script
         final List<String> arguments = new ArrayList(Arrays.asList(args));
@@ -299,6 +309,19 @@ public class Main {
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
     }
 
+    /**
+     * reads up to maxRead bytes from InputStream if available into a String
+     *
+     * @param in input stream to be read
+     * @param maxToRead maximum number of bytes to read from the in
+     * @return a String read from in
+     * @throws IOException when reading in caused it
+     */
+    private static String readStringNonBlocking(InputStream in, int maxToRead) throws IOException {
+        byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
+        in.read(buffer);
+        return new String(buffer);
+    }
     private static void trimOffOurOptions(List arguments) {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
