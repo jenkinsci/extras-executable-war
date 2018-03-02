@@ -9,7 +9,7 @@
   <groupId>org.jenkins-ci</groupId>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
-  <version>1.37</version>
+  <version>1.38-SNAPSHOT</version>
 
   <properties>
     <java.level>6</java.level>
@@ -19,7 +19,7 @@
     <connection>scm:git:git://github.com/jenkinsci/extras-executable-war.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/extras-executable-war.git</developerConnection>
     <url>https://github.com/jenkinsci/extras-executable-war</url>
-    <tag>executable-war-1.37</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
