@@ -121,7 +121,7 @@ public class Main {
             if (v!=null) {
                 try {
                 	//Solving issue JENKINS-49737 adding warning for Java version 9
-                    if (Float.parseFloat(v)<52.0f || Float.parseFloat(v)==53.0f)
+                    if (Float.parseFloat(v)!=52.0f)
                         throw new UnsupportedClassVersionError(v);
                     
                 } catch (NumberFormatException e) {
@@ -134,7 +134,7 @@ public class Main {
             _main(args);
         } catch (UnsupportedClassVersionError e) {
         	// printing error for JENKINS-49737
-            System.err.println("Jenkins atleast requires Java8 and does not support Java 9, but you are running "+
+            System.err.println(""Jenkins requires Java8, but you are running "+
                 System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
             e.printStackTrace();
         }
