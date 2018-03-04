@@ -10,6 +10,8 @@
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
   <version>1.38-SNAPSHOT</version>
+  <description>Defines the main() method for a self-contained web application that kickstarts
+    embedded Winstone and runs a web application without needing a servlet container.</description>
 
   <properties>
     <java.level>6</java.level>

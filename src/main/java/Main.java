@@ -264,7 +264,7 @@ public class Main {
 
         // override the usage screen
         Field usage = launcher.getField("USAGE");
-        usage.set(null,"Jenkins Continuous Integration Engine "+getVersion("")+"\n" +
+        usage.set(null,"Jenkins Automation Server Engine "+getVersion("")+"\n" +
                 "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
