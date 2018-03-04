@@ -22,6 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Context;
@@ -89,6 +91,8 @@ public class Main {
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
+    //TODO: Bug, not a feature
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior. We do not know which encoding was used to generate WEB-INF/classes/dependencies.txt")
     private static Map<String,String> parseDependencyVersions() throws IOException {
         
         final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
@@ -197,8 +201,7 @@ public class Main {
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
-                LogFileOutputStream los = new LogFileOutputStream(new File(args[i].substring("--logfile=".length())));
-                PrintStream ps = new PrintStream(los);
+                PrintStream ps = createLogFileStream(new File(args[i].substring("--logfile=".length())));
                 System.setOut(ps);
                 System.setErr(ps);
                 // don't let winstone see this
@@ -309,6 +312,13 @@ public class Main {
         mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
     }
 
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "--logfile relies on the default encoding, fine")
+    private static PrintStream createLogFileStream(File file) throws IOException {
+        LogFileOutputStream los = new LogFileOutputStream(file);
+        return new PrintStream(los);
+    }
+
+    //TODO: Get rid of FB warning after updating to Java 7
     /**
      * reads up to maxRead bytes from InputStream if available into a String
      *
@@ -317,6 +327,7 @@ public class Main {
      * @return a String read from in
      * @throws IOException when reading in caused it
      */
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior")
     private static String readStringNonBlocking(InputStream in, int maxToRead) throws IOException {
         byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
         in.read(buffer);
