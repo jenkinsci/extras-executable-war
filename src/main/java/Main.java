@@ -121,8 +121,7 @@ public class Main {
             if (v!=null) {
                 try {
                     if (Float.parseFloat(v)!=52.0f)
-                        throw new UnsupportedClassVersionError(v);
-                    
+                        throw new UnsupportedClassVersionError(v);   
                 } catch (NumberFormatException e) {
                     // err on the safe side and keep on going
                 }
@@ -132,7 +131,7 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println(""Jenkins requires Java8, but you are running "+
+            System.err.println("Jenkins requires Java8, but you are running "+
                 System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
             e.printStackTrace();
         }
