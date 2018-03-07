@@ -93,7 +93,7 @@ public class Main {
      */
     //TODO: Bug, not a feature
     @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior. We do not know which encoding was used to generate WEB-INF/classes/dependencies.txt")
-    private static Map<String,String> parseDependencyVersions() throws IOException {
+    /*package*/ static Map<String,String> parseDependencyVersions() throws IOException {
         
         final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
         if (dependenciesInputStream == null) {
