@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -42,6 +44,7 @@ import java.io.PrintStream;
 class MainDialog extends JFrame {
     private final JTextArea textArea = new JTextArea();
 
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior, it is fine to use default encoding for console redirects")
     public MainDialog() throws HeadlessException, IOException {
         super("Jenkins Console");
         
