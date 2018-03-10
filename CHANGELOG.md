@@ -8,8 +8,7 @@ Release date: Mar 10, 2018
 * [JENKINS-49737](https://issues.jenkins-ci.org/browse/JENKINS-49737) -
 Print warning if the executable is started with Java 9 or above.
 * [PR #15](https://github.com/jenkinsci/extras-executable-war/pull/15) -
-Developer: Update to the newest Jenkins plugin POM. 
-Cleanup issues reported by FindBugs and Animal sniffer.
+Developer: Update to the newest parent POM, cleanup issues reported by static analysis.
 
 ### 1.37
 
