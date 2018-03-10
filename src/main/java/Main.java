@@ -121,7 +121,7 @@ public class Main {
             if (v!=null) {
                 try {
                     if (Float.parseFloat(v)!=52.0f)
-                        throw new UnsupportedClassVersionError(v);   
+                        throw new UnsupportedClassVersionError(v);
                 } catch (NumberFormatException e) {
                     // err on the safe side and keep on going
                 }
