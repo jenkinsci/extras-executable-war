@@ -475,6 +475,10 @@ public class Main {
     }
 
     private static void deleteWinstoneTempContents(File file) throws IOException {
+        if (!file.exists()) {
+            LOGGER.log(Level.FINEST, "No file found at {0}, nothing to delete.", file);
+            return;
+        }
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
