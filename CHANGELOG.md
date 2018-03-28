@@ -6,7 +6,7 @@ Changelog
 Release date: Mar 28, 2018
 
 * [JENKINS-50439](https://issues.jenkins-ci.org/browse/JENKINS-50439) -
-  Remove spurious warning when starting Jenkins
+  Remove spurious "Failed to delete the temporary Winstone file /tmp/winstone/jenkins-2.x.war" warning when starting Jenkins
 
 ### 1.38
 
