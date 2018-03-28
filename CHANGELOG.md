@@ -1,6 +1,13 @@
 Changelog
 ====
 
+### 1.39
+
+Release date: Mar 28, 2018
+
+* [JENKINS-50439](https://issues.jenkins-ci.org/browse/JENKINS-50439) -
+  Remove spurious warning when starting Jenkins
+
 ### 1.38
 
 Release date: Mar 10, 2018
