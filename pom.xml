@@ -9,7 +9,7 @@
   <groupId>org.jenkins-ci</groupId>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
-  <version>1.40-SNAPSHOT</version>
+  <version>1.40</version>
   <description>Defines the main() method for a self-contained web application that kickstarts
     embedded Winstone and runs a web application without needing a servlet container.</description>
 
@@ -21,7 +21,7 @@
     <connection>scm:git:git://github.com/jenkinsci/extras-executable-war.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/extras-executable-war.git</developerConnection>
     <url>https://github.com/jenkinsci/extras-executable-war</url>
-    <tag>HEAD</tag>
+    <tag>executable-war-1.40</tag>
   </scm>
 
   <dependencies>
