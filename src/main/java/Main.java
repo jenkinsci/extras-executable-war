@@ -24,6 +24,7 @@
  */
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import javax.annotation.Nonnull;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Context;
@@ -65,7 +66,8 @@ import java.util.zip.ZipFile;
 public class Main {
     
     private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
-    
+    private static final float REQUIRED_JAVA_VERSION = 52.0f;
+
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     
     /**
@@ -124,10 +126,23 @@ public class Main {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
                 try {
-                    if (Float.parseFloat(v)!=52.0f)
-                        throw new UnsupportedClassVersionError(v);
+                    float javaVersion = Float.parseFloat(v);
+                    if (javaVersion != REQUIRED_JAVA_VERSION) {
+                        Error error = new UnsupportedClassVersionError(v);
+                        if (javaVersion > REQUIRED_JAVA_VERSION && hasArgument("--enable-future-java", args)) {
+                            LOGGER.log(Level.WARNING,
+                                    String.format("Running with Java class version %s, but %s is required." +
+                                            "Argument --enable-future-java is set, so will continue.", javaVersion, REQUIRED_JAVA_VERSION));
+                        } else {
+                            LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required." +
+                                    "Run with the --enable-future-java flag to enable such behavior",
+                                    javaVersion, REQUIRED_JAVA_VERSION), error);
+                            throw error;
+                        }
+                    }
                 } catch (NumberFormatException e) {
                     // err on the safe side and keep on going
+                    LOGGER.log(Level.WARNING, "Failed to parse java.class.version: {0}. Will continue execution", v);
                 }
             }
 
@@ -141,16 +156,23 @@ public class Main {
         }
     }
 
+    //TODO: Rework everything to use List
+    private static boolean hasArgument(@Nonnull String argument, @Nonnull String[] args) {
+        for (String arg : args) {
+            if (argument.equals(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void _main(String[] args) throws Exception {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
-        for (String arg:args){
-            if ("--paramsFromStdIn".equals(arg)) {
-                System.out.println("--paramsFromStdIn detected. Parameters are going to be read from stdin. Other parameters passed directly will be ignored.");
-                String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
-                args = argsInStdIn.split(" +");
-                break;
-            }
+        if (hasArgument("--paramsFromStdIn", args)) {
+            System.out.println("--paramsFromStdIn detected. Parameters are going to be read from stdin. Other parameters passed directly will be ignored.");
+            String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
+            args = argsInStdIn.split(" +");
         }
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
         // This makes it easier to grab the version from a script
@@ -274,6 +296,7 @@ public class Main {
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --logfile                = redirect log messages to this file\n" +
+                "   --enable-future-java     = allows running with new Java versions which are not fully supported (" + REQUIRED_JAVA_VERSION + " and above)\n" +
                 "{OPTIONS}");
 
         
@@ -337,7 +360,7 @@ public class Main {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
             if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
-                    || arg.startsWith("--pluginroot"))
+                    || arg.startsWith("--pluginroot") || arg.startsWith("--enable-future-java"))
                 itr.remove();
         }
     }
