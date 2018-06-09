@@ -1,6 +1,13 @@
 Changelog
 ====
 
+### 1.40
+
+Release date: Jun 10, 2018
+
+* [JENKINS-51155](https://issues.jenkins-ci.org/browse/JENKINS-51155) -
+Add a `--enable-future-java` flag, which allows running with not-yet-supported Java versions
+
 ### 1.39
 
 Release date: Mar 28, 2018
