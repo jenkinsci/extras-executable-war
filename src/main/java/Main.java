@@ -127,18 +127,27 @@ public class Main {
             if (v!=null) {
                 try {
                     float javaVersion = Float.parseFloat(v);
-                    if (javaVersion != REQUIRED_JAVA_VERSION) {
+                    //TODO: add support of version ranges instead of equality check
+                    if (javaVersion == REQUIRED_JAVA_VERSION) {
+                        // Fine
+                    } else if (javaVersion > REQUIRED_JAVA_VERSION) {
                         Error error = new UnsupportedClassVersionError(v);
-                        if (javaVersion > REQUIRED_JAVA_VERSION && hasArgument("--enable-future-java", args)) {
+                        if (hasArgument("--enable-future-java", args)) {
                             LOGGER.log(Level.WARNING,
                                     String.format("Running with Java class version %s, but %s is required." +
-                                            "Argument --enable-future-java is set, so will continue.", javaVersion, REQUIRED_JAVA_VERSION));
+                                            "Argument --enable-future-java is set, so will continue", javaVersion, REQUIRED_JAVA_VERSION));
                         } else {
                             LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required." +
                                     "Run with the --enable-future-java flag to enable such behavior",
                                     javaVersion, REQUIRED_JAVA_VERSION), error);
                             throw error;
                         }
+                    } else {
+                        Error error = new UnsupportedClassVersionError(v);
+                        LOGGER.log(Level.SEVERE,
+                                String.format("Running with Java class version %s, which is older than the required %s",
+                                        javaVersion, REQUIRED_JAVA_VERSION), error);
+                        throw error;
                     }
                 } catch (NumberFormatException e) {
                     // err on the safe side and keep on going
