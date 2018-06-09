@@ -131,12 +131,12 @@ public class Main {
                     if (javaVersion == REQUIRED_JAVA_VERSION) {
                         // Fine
                     } else if (javaVersion > REQUIRED_JAVA_VERSION) {
-                        Error error = new UnsupportedClassVersionError(v);
                         if (hasArgument("--enable-future-java", args)) {
                             LOGGER.log(Level.WARNING,
                                     String.format("Running with Java class version %s, but %s is required." +
                                             "Argument --enable-future-java is set, so will continue", javaVersion, REQUIRED_JAVA_VERSION));
                         } else {
+                            Error error = new UnsupportedClassVersionError(v);
                             LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required." +
                                     "Run with the --enable-future-java flag to enable such behavior",
                                     javaVersion, REQUIRED_JAVA_VERSION), error);
