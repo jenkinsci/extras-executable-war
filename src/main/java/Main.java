@@ -423,9 +423,7 @@ public class Main {
         try {
             URL classFile = Main.class.getClassLoader().getResource("Main.class");
             JarFile jf = ((JarURLConnection) classFile.openConnection()).getJarFile();
-            Field f = ZipFile.class.getDeclaredField("name");
-            f.setAccessible(true);
-            return new File((String) f.get(jf));
+            return new File(jf.getName());
         } catch (Exception x) {
             System.err.println("ZipFile.name trick did not work, using fallback: " + x);
         }
