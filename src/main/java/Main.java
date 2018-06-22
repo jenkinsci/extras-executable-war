@@ -145,7 +145,7 @@ public class Main {
                     } else {
                         Error error = new UnsupportedClassVersionError(v);
                         LOGGER.log(Level.SEVERE,
-                                String.format("Running with Java class version %s, which is older than the required %s",
+                                String.format("Running with Java class version %s, which is older than the required %s. See https://jenkins.io/redirect/java-support/",
                                         javaVersion, REQUIRED_JAVA_VERSION), error);
                         throw error;
                     }
