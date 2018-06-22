@@ -1,6 +1,17 @@
 Changelog
 ====
 
+### 1.41
+
+Release date: Jun 22, 2018
+
+* [JENKINS-51994](https://issues.jenkins-ci.org/browse/JENKINS-51994) -
+Warnings for unsupported Java versions now include the link to
+the [Java Support Page](https://jenkins.io/redirect/java-support)
+* [JENKINS-46622](https://issues.jenkins-ci.org/browse/JENKINS-46622) -
+Fix the Illegal Reflective Access warning on startup when running
+with Java 9+ (experimental support)
+
 ### 1.40
 
 Release date: Jun 10, 2018
