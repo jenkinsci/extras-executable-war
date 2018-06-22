@@ -134,18 +134,18 @@ public class Main {
                         if (hasArgument("--enable-future-java", args)) {
                             LOGGER.log(Level.WARNING,
                                     String.format("Running with Java class version %s, but %s is required." +
-                                            "Argument --enable-future-java is set, so will continue", javaVersion, REQUIRED_JAVA_VERSION));
+                                            "Argument --enable-future-java is set, so will continue. See https://jenkins.io/redirect/java-support/", javaVersion, REQUIRED_JAVA_VERSION));
                         } else {
                             Error error = new UnsupportedClassVersionError(v);
                             LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required." +
-                                    "Run with the --enable-future-java flag to enable such behavior",
+                                    "Run with the --enable-future-java flag to enable such behavior. See https://jenkins.io/redirect/java-support/",
                                     javaVersion, REQUIRED_JAVA_VERSION), error);
                             throw error;
                         }
                     } else {
                         Error error = new UnsupportedClassVersionError(v);
                         LOGGER.log(Level.SEVERE,
-                                String.format("Running with Java class version %s, which is older than the required %s",
+                                String.format("Running with Java class version %s, which is older than the required %s. See https://jenkins.io/redirect/java-support/",
                                         javaVersion, REQUIRED_JAVA_VERSION), error);
                         throw error;
                     }
