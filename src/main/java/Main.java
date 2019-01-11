@@ -89,7 +89,12 @@ public class Main {
      */
     private static final boolean DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME = 
             Boolean.getBoolean("executableWar.jetty.disableCustomSessionIdCookieName");
-    
+
+    /**
+     * Flag to bypass the Java version check when starting.
+     */
+    private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
+
     /**
      * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
      */
@@ -131,14 +136,16 @@ public class Main {
                     if (javaVersion == REQUIRED_JAVA_VERSION) {
                         // Fine
                     } else if (javaVersion > REQUIRED_JAVA_VERSION) {
-                        if (hasArgument("--enable-future-java", args)) {
+                        if (isFutureJavaEnabled(args)) {
                             LOGGER.log(Level.WARNING,
-                                    String.format("Running with Java class version %s, but %s is required." +
-                                            "Argument --enable-future-java is set, so will continue. See https://jenkins.io/redirect/java-support/", javaVersion, REQUIRED_JAVA_VERSION));
+                                    String.format("Running with Java class version %s, but %s is required. " +
+                                                          "Argument " + ENABLE_FUTURE_JAVA_CLI_SWITCH + " is set, so will continue. " +
+                                                          "See https://jenkins.io/redirect/java-support/", javaVersion, REQUIRED_JAVA_VERSION));
                         } else {
                             Error error = new UnsupportedClassVersionError(v);
-                            LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required." +
-                                    "Run with the --enable-future-java flag to enable such behavior. See https://jenkins.io/redirect/java-support/",
+                            LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required. " +
+                                                                           "Run with the " + ENABLE_FUTURE_JAVA_CLI_SWITCH + " flag to enable such behavior. " +
+                                                                           "See https://jenkins.io/redirect/java-support/",
                                     javaVersion, REQUIRED_JAVA_VERSION), error);
                             throw error;
                         }
@@ -163,6 +170,14 @@ public class Main {
                 System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Returns true if the Java runtime version check should not be done, and any version allowed.
+     * @see #ENABLE_FUTURE_JAVA_CLI_SWITCH
+     */
+    private static boolean isFutureJavaEnabled(String[] args) {
+        return hasArgument(ENABLE_FUTURE_JAVA_CLI_SWITCH, args) || Boolean.parseBoolean(System.getenv("JENKINS_ENABLE_FUTURE_JAVA"));
     }
 
     //TODO: Rework everything to use List
@@ -305,7 +320,7 @@ public class Main {
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --logfile                = redirect log messages to this file\n" +
-                "   --enable-future-java     = allows running with new Java versions which are not fully supported (" + REQUIRED_JAVA_VERSION + " and above)\n" +
+                "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (" + REQUIRED_JAVA_VERSION + " and above)\n" +
                 "{OPTIONS}");
 
         
@@ -369,7 +384,7 @@ public class Main {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
             if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
-                    || arg.startsWith("--pluginroot") || arg.startsWith("--enable-future-java"))
+                    || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH))
                 itr.remove();
         }
     }
