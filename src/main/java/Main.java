@@ -177,7 +177,7 @@ public class Main {
      * @see #ENABLE_FUTURE_JAVA_CLI_SWITCH
      */
     private static boolean isFutureJavaEnabled(String[] args) {
-        return hasArgument(ENABLE_FUTURE_JAVA_CLI_SWITCH, args) || Boolean.parseBoolean(System.getenv("ENABLE_FUTURE_JAVA"));
+        return hasArgument(ENABLE_FUTURE_JAVA_CLI_SWITCH, args) || Boolean.parseBoolean(System.getenv("JENKINS_ENABLE_FUTURE_JAVA"));
     }
 
     //TODO: Rework everything to use List
