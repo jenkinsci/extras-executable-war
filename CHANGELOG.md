@@ -1,13 +1,13 @@
 Changelog
 ====
 
-### 1.43
+### 1.44
 
 * [PR-20](https://github.com/jenkinsci/extras-executable-war/pull/20): Allow using `JENKINS_ENABLE_FUTURE_JAVA` environment variable to do the same as the CLI switch `--enable-future-java`
 
-### 1.42
+### 1.42 & 1.43
 
-Burnt version.
+Burnt versions.
 
 ### 1.41
 
@@ -47,7 +47,7 @@ Developer: Update to the newest parent POM, cleanup issues reported by static an
 
 Release date: Jan 08, 2018
 
-* [PR #13](https://github.com/jenkinsci/extras-executable-war/pull/13) - 
+* [PR #13](https://github.com/jenkinsci/extras-executable-war/pull/13) -
 Add ability to supply WAR command-line arguments via STDIN using the `--paramsFromStdIn` parameter
 ([Documentation](https://github.com/jenkinsci/extras-executable-war#parameters-from-stdin)).
 * [JENKINS-22088](https://issues.jenkins-ci.org/browse/JENKINS-22088) -
