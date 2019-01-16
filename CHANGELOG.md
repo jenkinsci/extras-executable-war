@@ -1,6 +1,14 @@
 Changelog
 ====
 
+### 1.43
+
+* [PR-20](https://github.com/jenkinsci/extras-executable-war/pull/20): Allow using `JENKINS_ENABLE_FUTURE_JAVA` environment variable to do the same as the CLI switch `--enable-future-java`
+
+### 1.42
+
+Burnt version.
+
 ### 1.41
 
 Release date: Jun 22, 2018
