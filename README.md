@@ -18,7 +18,7 @@ when running multiple Jenkins instances on the same host.
 Every startup the wrapper picks a new random cookie name (format: `JSESSIONID.${* random hex symbols}`).
 The default lifetime of these cookies is 1 day, hence in some cases you may get into issues like [JENKINS-25046 (too many active cookies)](https://issues.jenkins-ci.org/browse/JENKINS-25046) when you restart Jenkins too often or use multiple instances.
 
-Starting from version `TODO`, it is possible to customize the behavior via System Properties:
+Starting from version `1.36`, it is possible to customize the behavior via System Properties:
 
 * `executableWar.jetty.disableCustomSessionIdCookieName` - 
 (`boolean`, default: `false`) -  
