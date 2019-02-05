@@ -46,10 +46,12 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -66,7 +68,9 @@ import java.util.zip.ZipFile;
 public class Main {
     
     private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
-    private static final float REQUIRED_JAVA_VERSION = 52.0f;
+    private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
+            new HashSet<Integer>(Arrays.asList(52, 55));
+    private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     
@@ -130,30 +134,33 @@ public class Main {
         try {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
+                String classVersionString = v.split("\\.")[0];
                 try {
-                    float javaVersion = Float.parseFloat(v);
+                    int javaVersion = Integer.parseInt(classVersionString);
                     //TODO: add support of version ranges instead of equality check
-                    if (javaVersion == REQUIRED_JAVA_VERSION) {
+                    if (SUPPORTED_JAVA_CLASS_VERSIONS.contains(javaVersion)) {
                         // Fine
-                    } else if (javaVersion > REQUIRED_JAVA_VERSION) {
+                    } else if (javaVersion > MINIMUM_JAVA_CLASS_VERSION) {
                         if (isFutureJavaEnabled(args)) {
                             LOGGER.log(Level.WARNING,
-                                    String.format("Running with Java class version %s, but %s is required. " +
-                                                          "Argument " + ENABLE_FUTURE_JAVA_CLI_SWITCH + " is set, so will continue. " +
-                                                          "See https://jenkins.io/redirect/java-support/", javaVersion, REQUIRED_JAVA_VERSION));
+                                    String.format("Running with Java class version %s which is not in the list of supported versions: %s. " +
+                                                          "Argument %s is set, so will continue. " +
+                                                          "See https://jenkins.io/redirect/java-support/",
+                                                javaVersion, SUPPORTED_JAVA_CLASS_VERSIONS, ENABLE_FUTURE_JAVA_CLI_SWITCH));
                         } else {
                             Error error = new UnsupportedClassVersionError(v);
-                            LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s, but %s is required. " +
+                            LOGGER.log(Level.SEVERE, String.format("Running with Java class version %s which is not in the list of supported versions: %s. " +
                                                                            "Run with the " + ENABLE_FUTURE_JAVA_CLI_SWITCH + " flag to enable such behavior. " +
                                                                            "See https://jenkins.io/redirect/java-support/",
-                                    javaVersion, REQUIRED_JAVA_VERSION), error);
+                                    javaVersion, SUPPORTED_JAVA_CLASS_VERSIONS), error);
                             throw error;
                         }
                     } else {
                         Error error = new UnsupportedClassVersionError(v);
                         LOGGER.log(Level.SEVERE,
-                                String.format("Running with Java class version %s, which is older than the required %s. See https://jenkins.io/redirect/java-support/",
-                                        javaVersion, REQUIRED_JAVA_VERSION), error);
+                                String.format("Running with Java class version %s, which is older than the Minimum required version %s. " +
+                                                "See https://jenkins.io/redirect/java-support/",
+                                        javaVersion, MINIMUM_JAVA_CLASS_VERSION), error);
                         throw error;
                     }
                 } catch (NumberFormatException e) {
@@ -320,7 +327,7 @@ public class Main {
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
                 "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --logfile                = redirect log messages to this file\n" +
-                "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (" + REQUIRED_JAVA_VERSION + " and above)\n" +
+                "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (class version " + MINIMUM_JAVA_CLASS_VERSION + " and above)\n" +
                 "{OPTIONS}");
 
         
