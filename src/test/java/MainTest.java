@@ -6,13 +6,9 @@ import org.jvnet.hudson.test.Issue;
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @For(Main.class)
 public class MainTest {
-
-    private static final Logger LOGGER = Logger.getLogger(MainTest.class.getName());
 
     @Test(expected = IOException.class)
     public void shouldHaveNoStandardDependenciesFile() throws IOException {
@@ -64,7 +60,9 @@ public class MainTest {
             Main.verifyJavaVersion(classVersion, enableFutureJava);
         } catch (Error error) {
             failed = true;
-            LOGGER.log(Level.WARNING, "Java class version check failed as it was expected", error);
+            System.out.println(String.format("Java class version check failed as it was expected for Java class version %s.0 and enableFutureJava=%s",
+                classVersion, enableFutureJava));
+            error.printStackTrace(System.out);
         }
 
         if (!failed) {
@@ -83,9 +81,8 @@ public class MainTest {
         try {
             Main.verifyJavaVersion(classVersion, enableFutureJava);
         } catch (Error error) {
-            LOGGER.log(Level.WARNING, "Java class version check failed as it was expected", error);
             AssertionError err = new AssertionError(message != null ? message :
-                    String.format("Java version Check should have failed for Java class version %s.0 and enableFutureJava=%s",
+                    String.format("Java version Check should have passed for Java class version %s.0 and enableFutureJava=%s",
                             classVersion, enableFutureJava));
             err.initCause(error);
             throw err;
