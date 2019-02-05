@@ -68,6 +68,8 @@ import java.util.zip.ZipFile;
 public class Main {
     
     private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
+    private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
+            new HashSet<Integer>(Arrays.asList(8, 11));
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
             new HashSet<Integer>(Arrays.asList(52, 55));
     private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
@@ -173,8 +175,10 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println("Jenkins requires Java 8, but you are running "+
-                System.getProperty("java.runtime.version")+" from "+System.getProperty("java.home"));
+            System.err.println(String.format(
+                    "Jenkins requires Java versions %s but you are running with Java %s from %s",
+                    SUPPORTED_JAVA_VERSIONS, System.getProperty("java.specification.version"), System.getProperty("java.home"))
+            );
             e.printStackTrace();
         }
     }
