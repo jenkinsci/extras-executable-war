@@ -1,11 +1,22 @@
 Changelog
 ====
 
+### 1.45
+
+Release date: Feb 07, 2019
+
+* [JENKINS-52285](https://issues.jenkins-ci.org/browse/JENKINS-52285) -
+Allow running with Java 11 without setting 
+the `--enable-future-java` flag or the environment variable
+  * It is still possible to run with Java 9 and 10 using this flag,
+    but these versions are [not supported](https://jenkins.io/doc/administration/requirements/java/) by the Jenkins project 
+
 ### 1.44
 
 Release date: Jan 16, 2019
 
-* [PR-20](https://github.com/jenkinsci/extras-executable-war/pull/20): Allow using `JENKINS_ENABLE_FUTURE_JAVA` environment variable to do the same as the CLI switch `--enable-future-java`
+* [PR-20](https://github.com/jenkinsci/extras-executable-war/pull/20) - 
+Allow using `JENKINS_ENABLE_FUTURE_JAVA` environment variable to do the same as the CLI switch `--enable-future-java`
 
 ### 1.42 & 1.43
 
