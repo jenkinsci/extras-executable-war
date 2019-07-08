@@ -390,7 +390,7 @@ public class Main {
      * @return a String read from in
      * @throws IOException when reading in caused it
      */
-    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior")
+    @SuppressFBWarnings(value = {"DM_DEFAULT_ENCODING", "RR_NOT_CHECKED"}, justification = "Legacy behavior, We expect less input than maxToRead")
     private static String readStringNonBlocking(InputStream in, int maxToRead) throws IOException {
         byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
         in.read(buffer);
