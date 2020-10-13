@@ -41,8 +41,11 @@ for (int i = 0; i < platforms.size(); ++i) {
                     junit '**/target/surefire-reports/TEST-*.xml'
 
                     if (label == 'linux') {
-                      archiveArtifacts artifacts: '**/target/**/*.jar'
-                      findbugs pattern: '**/target/findbugsXml.xml'
+                        archiveArtifacts artifacts: '**/target/**/*.jar'
+                        recordIssues(
+                            enabledForFailure: true, aggregatingResults: true,
+                            tools: [java(), spotBugs(pattern: '**/target/spotbugsXml.xml')]
+                        )
                     }
                 }
             }
