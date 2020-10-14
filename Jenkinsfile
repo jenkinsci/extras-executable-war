@@ -44,7 +44,7 @@ for (int i = 0; i < platforms.size(); ++i) {
                         archiveArtifacts artifacts: '**/target/**/*.jar'
                         recordIssues(
                             enabledForFailure: true, aggregatingResults: true,
-                            tools: [java(), findBugs(pattern: '**/target/findbugsXml.xml')]
+                            tools: [java(), spotBugs(pattern: '**/target/spotbugsXml.xml')]
                         )
                     }
                 }
