@@ -242,14 +242,14 @@ public class Main {
 
                 // tell the user that we'll be starting as a daemon.
                 Method isDaemonized = $daemon.getMethod("isDaemonized");
-                if (!(Boolean) isDaemonized.invoke(daemon, new Object[0])) {
+                if (!(Boolean) isDaemonized.invoke(daemon)) {
                     System.out.println("Forking into background to run as a daemon.");
                     if (!hasOption(arguments, "--logfile="))
                         System.out.println("Use --logfile to redirect output to a file");
                 }
 
                 Method m = $daemon.getMethod("all", boolean.class);
-                m.invoke(daemon, Boolean.TRUE);
+                m.invoke(daemon, true);
             }
         }
 
@@ -479,7 +479,7 @@ public class Main {
             tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
             String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
-            throw new IOException("Jenkins has failed to create a temporary file in " + tmpdir, e);
+            throw new IOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
         try (InputStream is = res.openStream()) {
             try (OutputStream os = new FileOutputStream(tmp)) {
@@ -519,7 +519,9 @@ public class Main {
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
-                for (File value : files) deleteWinstoneTempContents(value);
+                for (File value : files) {
+                   deleteWinstoneTempContents(value);
+                }
             }
         }
         if (!file.delete()) {
