@@ -449,10 +449,9 @@ public class Main {
         }
         File myself = File.createTempFile("jenkins", ".jar", directory);
         myself.deleteOnExit();
-        try (InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream()) {
-            try (OutputStream os = new FileOutputStream(myself)) {
-                copyStream(is, os);
-            }
+        try (InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
+             OutputStream os = new FileOutputStream(myself)) {
+            copyStream(is, os);
         }
         return myself;
     }
@@ -481,10 +480,9 @@ public class Main {
             String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
             throw new IOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
-        try (InputStream is = res.openStream()) {
-            try (OutputStream os = new FileOutputStream(tmp)) {
-                copyStream(is, os);
-            }
+        try (InputStream is = res.openStream();
+             OutputStream os = new FileOutputStream(tmp)) {
+            copyStream(is, os);
         }
         tmp.deleteOnExit();
         return tmp;
