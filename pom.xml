@@ -2,11 +2,10 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.54</version>
+    <version>1.59</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jenkins-ci</groupId>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
   <version>1.46-SNAPSHOT</version>
@@ -14,7 +13,10 @@
     embedded Winstone and runs a web application without needing a servlet container.</description>
 
   <properties>
-    <java.level>6</java.level>
+    <java.level>8</java.level>
+    <!-- Need to specify argline due to https://github.com/jenkinsci/pom/pull/138
+     At least this seems to be the case on windows -->
+    <argLine></argLine>
   </properties>
 
   <scm>
@@ -28,7 +30,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -42,30 +43,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <id>check</id>
-          </execution>
-        </executions>
-        <configuration combine.children="append">
-          <ignores>
-            <!-- Uses Java7 code, but we check the Java version in the beginning of Main -->
-            <ignore>sun.misc.SignalHandler</ignore>
-            <ignore>sun.misc.Signal</ignore>
-          </ignores>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
   <repositories>
     <repository>

@@ -30,7 +30,6 @@ import javax.naming.NamingException;
 import javax.naming.Context;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,7 +39,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -57,7 +54,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
 
 /**
  * Launcher class for stand-alone execution of Jenkins as
@@ -69,9 +65,9 @@ public class Main {
     
     private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
-            new HashSet<Integer>(Arrays.asList(8, 11));
+            new HashSet<>(Arrays.asList(8, 11));
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
-            new HashSet<Integer>(Arrays.asList(52, 55));
+            new HashSet<>(Arrays.asList(52, 55));
     private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
@@ -112,19 +108,16 @@ public class Main {
         if (dependenciesInputStream == null) {
             throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
         }
-        final Map<String,String> r = new HashMap<String,String>();
+        final Map<String,String> r = new HashMap<>();
         try {
-            final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
-            try {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream))) {
                 String line;
-                while ((line=in.readLine())!=null) {
+                while ((line = in.readLine()) != null) {
                     line = line.trim();
                     String[] tokens = line.split(":");
-                    if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
-                    r.put(tokens[0]+":"+tokens[1],tokens[3]);
+                    if (tokens.length != 5) continue;   // there should be 5 tuples group:artifact:type:version:scope
+                    r.put(tokens[0] + ":" + tokens[1], tokens[3]);
                 }
-            } finally {
-                in.close();
             }
         } finally {
             dependenciesInputStream.close();
@@ -206,6 +199,7 @@ public class Main {
         return false;
     }
 
+    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
     private static void _main(String[] args) throws Exception {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
@@ -216,16 +210,16 @@ public class Main {
         }
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
         // This makes it easier to grab the version from a script
-        final List<String> arguments = new ArrayList(Arrays.asList(args));
+        final List<String> arguments = new ArrayList<>(Arrays.asList(args));
         if (arguments.contains("--version")) {
             System.out.println(getVersion("?"));
             return;
         }
 
         File extractedFilesFolder = null;
-        for (int i = 0; i < args.length; i++) {
-            if(args[i].startsWith("--extractedFilesFolder=")) {
-                extractedFilesFolder = new File(args[i].substring("--extractedFilesFolder=".length()));
+        for (String arg : args) {
+            if (arg.startsWith("--extractedFilesFolder=")) {
+                extractedFilesFolder = new File(arg.substring("--extractedFilesFolder=".length()));
                 if (!extractedFilesFolder.isDirectory()) {
                     System.err.println("The extractedFilesFolder value is not a directory. Ignoring.");
                     extractedFilesFolder = null;
@@ -234,28 +228,28 @@ public class Main {
         }
 
         // if we need to daemonize, do it first
-        for (int i = 0; i < args.length; i++) {
-            if(args[i].startsWith("--daemon")) {
+        for (String arg : args) {
+            if (arg.startsWith("--daemon")) {
                 Map<String, String> revisions = parseDependencyVersions();
 
                 // load the daemonization code
                 ClassLoader cl = new URLClassLoader(new URL[]{
-                    extractFromJar("WEB-INF/lib/jna-"+getVersion(revisions, "net.java.dev.jna", "jna") +".jar","jna","jar", extractedFilesFolder).toURI().toURL(),
-                    extractFromJar("WEB-INF/lib/akuma-"+getVersion(revisions,"org.kohsuke","akuma")+".jar","akuma","jar", extractedFilesFolder).toURI().toURL(),
+                        extractFromJar("WEB-INF/lib/jna-" + getVersion(revisions, "net.java.dev.jna", "jna") + ".jar", "jna", "jar", extractedFilesFolder).toURI().toURL(),
+                        extractFromJar("WEB-INF/lib/akuma-" + getVersion(revisions, "org.kohsuke", "akuma") + ".jar", "akuma", "jar", extractedFilesFolder).toURI().toURL(),
                 });
-                Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
+                Class<?> $daemon = cl.loadClass("com.sun.akuma.Daemon");
                 Object daemon = $daemon.newInstance();
 
                 // tell the user that we'll be starting as a daemon.
-                Method isDaemonized = $daemon.getMethod("isDaemonized", new Class[]{});
-                if(!((Boolean)isDaemonized.invoke(daemon,new Object[0])).booleanValue()) {
+                Method isDaemonized = $daemon.getMethod("isDaemonized");
+                if (!(Boolean) isDaemonized.invoke(daemon, new Object[0])) {
                     System.out.println("Forking into background to run as a daemon.");
-                    if(!hasOption(arguments, "--logfile="))
+                    if (!hasOption(arguments, "--logfile="))
                         System.out.println("Use --logfile to redirect output to a file");
                 }
 
-                Method m = $daemon.getMethod("all", new Class[]{boolean.class});
-                m.invoke(daemon,new Object[]{Boolean.TRUE});
+                Method m = $daemon.getMethod("all", boolean.class);
+                m.invoke(daemon, Boolean.TRUE);
             }
         }
 
@@ -267,16 +261,16 @@ public class Main {
                 System.setOut(ps);
                 System.setErr(ps);
                 // don't let winstone see this
-                List _args = new ArrayList(Arrays.asList(args));
+                List<String> _args = new ArrayList<>(Arrays.asList(args));
                 _args.remove(i);
-                args = (String[]) _args.toArray(new String[_args.size()]);
+                args = _args.toArray(new String[0]);
                 break;
             }
         }
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("--pluginroot=")) {
+        for (String arg : args) {
+            if (arg.startsWith("--pluginroot=")) {
                 System.setProperty("hudson.PluginManager.workDir",
-                        new File(args[i].substring("--pluginroot=".length())).getAbsolutePath());
+                        new File(arg.substring("--pluginroot=".length())).getAbsolutePath());
                 // if specified multiple times, the first one wins
                 break;
             }
@@ -321,8 +315,8 @@ public class Main {
                 
         // locate the Winstone launcher
         ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
-        Class launcher = cl.loadClass("winstone.Launcher");
-        Method mainMethod = launcher.getMethod("main", new Class[]{String[].class});
+        Class<?> launcher = cl.loadClass("winstone.Launcher");
+        Method mainMethod = launcher.getMethod("main", String[].class);
 
         // override the usage screen
         Field usage = launcher.getField("USAGE");
@@ -396,22 +390,17 @@ public class Main {
         in.read(buffer);
         return new String(buffer);
     }
-    private static void trimOffOurOptions(List arguments) {
-        for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
-            String arg = (String) itr.next();
-            if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
-                    || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH))
-                itr.remove();
-        }
+    private static void trimOffOurOptions(List<String> arguments) {
+        arguments.removeIf(arg -> arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
+                || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH));
     }
 
-    private static String getVersion(Map revisions, String groupId, String artifactId) {
-        String v = (String)revisions.get(groupId + ":" + artifactId);
+    private static String getVersion(Map<String,String> revisions, String groupId, String artifactId) {
+        String v = revisions.get(groupId + ":" + artifactId);
         if (v==null) {
             // fall back to artifact ID only search, in case the artifact is renamed
-            for (Iterator itr = revisions.keySet().iterator(); itr.hasNext(); ) {
-                String key = (String) itr.next();
-                if (key.endsWith(":"+artifactId))
+            for (String key : revisions.keySet()) {
+                if (key.endsWith(":" + artifactId))
                     return v;
             }
         }
@@ -422,9 +411,9 @@ public class Main {
      * Figures out the version from the manifest.
      */
     private static String getVersion(String fallback) throws IOException {
-        Enumeration manifests = Main.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+        Enumeration<URL> manifests = Main.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
         while (manifests.hasMoreElements()) {
-            URL res = (URL)manifests.nextElement();
+            URL res = manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
             String v = manifest.getMainAttributes().getValue("Jenkins-Version");
             if(v!=null)
@@ -433,9 +422,8 @@ public class Main {
         return fallback;
     }
 
-    private static boolean hasOption(List args, String prefix) {
-        for (Iterator itr = args.iterator(); itr.hasNext();) {
-            String s = (String) itr.next();
+    private static boolean hasOption(List<String> args, String prefix) {
+        for (String s : args) {
             if (s.startsWith(prefix))
                 return true;
         }
@@ -445,7 +433,8 @@ public class Main {
     /**
      * Figures out the URL of <tt>jenkins.war</tt>.
      */
-    public static File whoAmI(File directory) throws IOException, URISyntaxException {
+    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN", "URLCONNECTION_SSRF_FD"}, justification = "User provided values for running the program.")
+    public static File whoAmI(File directory) throws IOException {
         // JNLP returns the URL where the jar was originally placed (like http://jenkins-ci.org/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
@@ -460,16 +449,10 @@ public class Main {
         }
         File myself = File.createTempFile("jenkins", ".jar", directory);
         myself.deleteOnExit();
-        InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
-        try {
-            OutputStream os = new FileOutputStream(myself);
-            try {
+        try (InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream()) {
+            try (OutputStream os = new FileOutputStream(myself)) {
                 copyStream(is, os);
-            } finally {
-                os.close();
             }
-        } finally {
-            is.close();
         }
         return myself;
     }
@@ -484,6 +467,7 @@ public class Main {
     /**
      * Extract a resource from jar, mark it for deletion upon exit, and return its location.
      */
+    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
     private static File extractFromJar(String resource, String fileName, String suffix, File directory) throws IOException {
         URL res = Main.class.getResource(resource);
         if (res==null)
@@ -495,20 +479,12 @@ public class Main {
             tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
             String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
-            IOException x = new IOException("Jenkins has failed to create a temporary file in " + tmpdir);
-            x.initCause(e);
-            throw x;
+            throw new IOException("Jenkins has failed to create a temporary file in " + tmpdir, e);
         }
-        InputStream is = res.openStream();
-        try {
-            OutputStream os = new FileOutputStream(tmp);
-            try {
-                copyStream(is,os);
-            } finally {
-                os.close();
+        try (InputStream is = res.openStream()) {
+            try (OutputStream os = new FileOutputStream(tmp)) {
+                copyStream(is, os);
             }
-        } finally {
-            is.close();
         }
         tmp.deleteOnExit();
         return tmp;
@@ -543,8 +519,7 @@ public class Main {
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files!=null) {// be defensive
-                for (int i = 0; i < files.length; i++)
-                    deleteWinstoneTempContents(files[i]);
+                for (File value : files) deleteWinstoneTempContents(value);
             }
         }
         if (!file.delete()) {
@@ -570,10 +545,10 @@ public class Main {
      *
      * @return the File alongside with some description to help the user troubleshoot issues
      */
+    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
     private static FileAndDescription getHomeDir() {
         // check JNDI for the home directory first
-        for (int i = 0; i < HOME_NAMES.length; i++) {
-            String name = HOME_NAMES[i];
+        for (String name : HOME_NAMES) {
             try {
                 InitialContext iniCtxt = new InitialContext();
                 Context env = (Context) iniCtxt.lookup("java:comp/env");
@@ -590,20 +565,18 @@ public class Main {
         }
 
         // next the system property
-        for (int i = 0; i < HOME_NAMES.length; i++) {
-            String name = HOME_NAMES[i];
+        for (String name : HOME_NAMES) {
             String sysProp = System.getProperty(name);
-            if(sysProp!=null)
-                return new FileAndDescription(new File(sysProp.trim()),"System.getProperty(\""+name+"\")");
+            if (sysProp != null)
+                return new FileAndDescription(new File(sysProp.trim()), "System.getProperty(\"" + name + "\")");
         }
 
         // look at the env var next
         try {
-            for (int i = 0; i < HOME_NAMES.length; i++) {
-                String name = HOME_NAMES[i];
+            for (String name : HOME_NAMES) {
                 String env = System.getenv(name);
-                if(env!=null)
-                    return new FileAndDescription(new File(env.trim()).getAbsoluteFile(),"EnvVars.masterEnvVars.get(\""+name+"\")");
+                if (env != null)
+                    return new FileAndDescription(new File(env.trim()).getAbsoluteFile(), "EnvVars.masterEnvVars.get(\"" + name + "\")");
             }
         } catch (Throwable e) {
             // this code fails when run on JDK1.4
