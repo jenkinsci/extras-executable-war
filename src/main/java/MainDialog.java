@@ -63,26 +63,22 @@ class MainDialog extends JFrame {
 
         // this thread sets the text to JTextArea
         final BufferedReader in = new BufferedReader(new InputStreamReader(new PipedInputStream(out)));
-        new Thread() {
-            public void run() {
-                try {
-                    while(true) {
-                        String line;
-                        while((line=in.readLine())!=null) {
-                            final String text = line;
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    textArea.append(text+'\n');
-                                    scrollDown();
-                                }
-                            });
-                        }
+        new Thread(() -> {
+            try {
+                while(true) {
+                    String line;
+                    while((line=in.readLine())!=null) {
+                        final String text = line;
+                        SwingUtilities.invokeLater(() -> {
+                            textArea.append(text+'\n');
+                            scrollDown();
+                        });
                     }
-                } catch (IOException e) {
-                    throw new Error(e);
                 }
+            } catch (IOException e) {
+                throw new Error(e);
             }
-        }.start();
+        }).start();
 
         pack();
     }

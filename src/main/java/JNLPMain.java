@@ -64,10 +64,7 @@ public class JNLPMain {
     public static void setUILookAndFeel() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (InstantiationException e) {
-        } catch (ClassNotFoundException e) {
-        } catch (UnsupportedLookAndFeelException e) {
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException e) {
         }
     }
 

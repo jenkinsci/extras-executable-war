@@ -31,8 +31,7 @@ public class ColorFormatter extends SimpleFormatter {
             return;
 
         Handler[] handlers = Logger.getLogger("").getHandlers();
-        for (int i = 0; i < handlers.length; i++) {
-            Handler h = handlers[i];
+        for (Handler h : handlers) {
             if (h.getClass() == ConsoleHandler.class) {
                 if (h.getFormatter().getClass() == SimpleFormatter.class)
                     h.setFormatter(new ColorFormatter());
