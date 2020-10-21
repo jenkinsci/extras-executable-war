@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.59</version>
+    <version>1.60</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -14,9 +14,6 @@
 
   <properties>
     <java.level>8</java.level>
-    <!-- Need to specify argline due to https://github.com/jenkinsci/pom/pull/138
-     At least this seems to be the case on windows -->
-    <argLine></argLine>
   </properties>
 
   <scm>
