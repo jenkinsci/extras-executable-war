@@ -233,33 +233,6 @@ public class Main {
             }
         }
 
-        // if we need to daemonize, do it first
-        for (int i = 0; i < args.length; i++) {
-            if(args[i].startsWith("--daemon")) {
-                Map<String, String> revisions = parseDependencyVersions();
-
-                // load the daemonization code
-                ClassLoader cl = new URLClassLoader(new URL[]{
-                    extractFromJar("WEB-INF/lib/jna-"+getVersion(revisions, "net.java.dev.jna", "jna") +".jar","jna","jar", extractedFilesFolder).toURI().toURL(),
-                    extractFromJar("WEB-INF/lib/akuma-"+getVersion(revisions,"org.kohsuke","akuma")+".jar","akuma","jar", extractedFilesFolder).toURI().toURL(),
-                });
-                Class $daemon = cl.loadClass("com.sun.akuma.Daemon");
-                Object daemon = $daemon.newInstance();
-
-                // tell the user that we'll be starting as a daemon.
-                Method isDaemonized = $daemon.getMethod("isDaemonized", new Class[]{});
-                if(!((Boolean)isDaemonized.invoke(daemon,new Object[0])).booleanValue()) {
-                    System.out.println("Forking into background to run as a daemon.");
-                    if(!hasOption(arguments, "--logfile="))
-                        System.out.println("Use --logfile to redirect output to a file");
-                }
-
-                Method m = $daemon.getMethod("all", new Class[]{boolean.class});
-                m.invoke(daemon,new Object[]{Boolean.TRUE});
-            }
-        }
-
-
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
@@ -334,7 +307,6 @@ public class Main {
                 "   --pluginroot             = folder where the plugin archives are expanded into. Default is ${JENKINS_HOME}/plugins\n" +
                 "                              (NOTE: this option does not change the directory where the plugin archives are stored)\n" +
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
-                "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --logfile                = redirect log messages to this file\n" +
                 "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (class version " + MINIMUM_JAVA_CLASS_VERSION + " and above)\n" +
                 "{OPTIONS}");
@@ -399,7 +371,7 @@ public class Main {
     private static void trimOffOurOptions(List arguments) {
         for (Iterator itr = arguments.iterator(); itr.hasNext(); ) {
             String arg = (String) itr.next();
-            if (arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
+            if (arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
                     || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH))
                 itr.remove();
         }
