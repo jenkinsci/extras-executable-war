@@ -377,19 +377,6 @@ public class Main {
         }
     }
 
-    private static String getVersion(Map revisions, String groupId, String artifactId) {
-        String v = (String)revisions.get(groupId + ":" + artifactId);
-        if (v==null) {
-            // fall back to artifact ID only search, in case the artifact is renamed
-            for (Iterator itr = revisions.keySet().iterator(); itr.hasNext(); ) {
-                String key = (String) itr.next();
-                if (key.endsWith(":"+artifactId))
-                    return v;
-            }
-        }
-        return v;
-    }
-
     /**
      * Figures out the version from the manifest.
      */
