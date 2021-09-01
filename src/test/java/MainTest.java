@@ -72,15 +72,12 @@ public class MainTest {
     }
 
     public void assertJavaCheckPasses(@CheckForNull String message, int classVersion, boolean enableFutureJava) {
-        boolean failed = false;
         try {
             Main.verifyJavaVersion(classVersion, enableFutureJava);
         } catch (Error error) {
-            AssertionError err = new AssertionError(message != null ? message :
+            throw new AssertionError(message != null ? message :
                     String.format("Java version Check should have passed for Java class version %s.0 and enableFutureJava=%s",
-                            classVersion, enableFutureJava));
-            err.initCause(error);
-            throw err;
+                            classVersion, enableFutureJava), error);
         }
     }
 }
