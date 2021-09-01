@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
@@ -49,8 +47,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.jar.JarFile;
@@ -67,7 +63,6 @@ import java.util.zip.ZipFile;
  */
 public class Main {
     
-    private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
             new HashSet<Integer>(Arrays.asList(8, 11));
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
@@ -100,37 +95,6 @@ public class Main {
      * Flag to bypass the Java version check when starting.
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
-
-    /**
-     * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
-     */
-    //TODO: Bug, not a feature
-    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior. We do not know which encoding was used to generate WEB-INF/classes/dependencies.txt")
-    /*package*/ static Map<String,String> parseDependencyVersions() throws IOException {
-        
-        final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
-        if (dependenciesInputStream == null) {
-            throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
-        }
-        final Map<String,String> r = new HashMap<String,String>();
-        try {
-            final BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream));
-            try {
-                String line;
-                while ((line=in.readLine())!=null) {
-                    line = line.trim();
-                    String[] tokens = line.split(":");
-                    if (tokens.length!=5)   continue;   // there should be 5 tuples group:artifact:type:version:scope
-                    r.put(tokens[0]+":"+tokens[1],tokens[3]);
-                }
-            } finally {
-                in.close();
-            }
-        } finally {
-            dependenciesInputStream.close();
-        }
-        return r;
-    }
 
     public static void main(String[] args) throws Exception {
         try {
