@@ -95,34 +95,6 @@ public class Main {
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
 
-    /**
-     * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
-     */
-    //TODO: Bug, not a feature
-    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior. We do not know which encoding was used to generate WEB-INF/classes/dependencies.txt")
-    /*package*/ static Map<String,String> parseDependencyVersions() throws IOException {
-        
-        final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
-        if (dependenciesInputStream == null) {
-            throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
-        }
-        final Map<String,String> r = new HashMap<>();
-        try {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream))) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    line = line.trim();
-                    String[] tokens = line.split(":");
-                    if (tokens.length != 5) continue;   // there should be 5 tuples group:artifact:type:version:scope
-                    r.put(tokens[0] + ":" + tokens[1], tokens[3]);
-                }
-            }
-        } finally {
-            dependenciesInputStream.close();
-        }
-        return r;
-    }
-
     public static void main(String[] args) throws Exception {
         try {
             String v = System.getProperty("java.class.version");
