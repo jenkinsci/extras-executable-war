@@ -1,6 +1,26 @@
 Changelog
 ====
 
+### 2.0
+
+Release date: Sep 02, 2021
+
+Breaking changes:
+
+* [PR #26](https://github.com/jenkinsci/extras-executable-war/pull/26) -
+  Stop supporting Java 1.6 and 1.7 in the executable.
+  Going forward, there will be no graceful error reporting for Java versions below Java 8.
+  Jenkins will not be affected, bercause Java 1.7 has not been supported for more than 3 years.
+* [PR #27](https://github.com/jenkinsci/extras-executable-war/pull/27) - 
+  Remove the `--daemon` option that is no longer used in Jenkins.
+  The system `daemon` and `daemonize` should be used as a replacement.
+
+Other changes:
+
+* [JENKINS-58058](https://issues.jenkins-ci.org/browse/JENKINS-58058) - Fix minor issues reported by SpotBugs
+* [PR #23](https://github.com/jenkinsci/extras-executable-war/pull/23) -
+  Move the project codebase to Java 8
+
 ### 1.45
 
 Release date: Feb 07, 2019
