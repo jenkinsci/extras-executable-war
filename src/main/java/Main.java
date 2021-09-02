@@ -197,32 +197,6 @@ public class Main {
             }
         }
 
-        // if we need to daemonize, do it first
-        for (String arg : args) {
-            if (arg.startsWith("--daemon")) {
-                Map<String, String> revisions = parseDependencyVersions();
-
-                // load the daemonization code
-                ClassLoader cl = new URLClassLoader(new URL[]{
-                        extractFromJar("WEB-INF/lib/jna-" + getVersion(revisions, "net.java.dev.jna", "jna") + ".jar", "jna", "jar", extractedFilesFolder).toURI().toURL(),
-                        extractFromJar("WEB-INF/lib/akuma-" + getVersion(revisions, "org.kohsuke", "akuma") + ".jar", "akuma", "jar", extractedFilesFolder).toURI().toURL(),
-                });
-                Class<?> $daemon = cl.loadClass("com.sun.akuma.Daemon");
-                Object daemon = $daemon.newInstance();
-
-                // tell the user that we'll be starting as a daemon.
-                Method isDaemonized = $daemon.getMethod("isDaemonized");
-                if (!(Boolean) isDaemonized.invoke(daemon)) {
-                    System.out.println("Forking into background to run as a daemon.");
-                    if (!hasOption(arguments, "--logfile="))
-                        System.out.println("Use --logfile to redirect output to a file");
-                }
-
-                Method m = $daemon.getMethod("all", boolean.class);
-                m.invoke(daemon, true);
-            }
-        }
-
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
