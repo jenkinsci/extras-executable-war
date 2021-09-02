@@ -338,18 +338,6 @@ public class Main {
                 || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH));
     }
 
-    private static String getVersion(Map<String,String> revisions, String groupId, String artifactId) {
-        String v = revisions.get(groupId + ":" + artifactId);
-        if (v==null) {
-            // fall back to artifact ID only search, in case the artifact is renamed
-            for (String key : revisions.keySet()) {
-                if (key.endsWith(":" + artifactId))
-                    return v;
-            }
-        }
-        return v;
-    }
-
     /**
      * Figures out the version from the manifest.
      */
