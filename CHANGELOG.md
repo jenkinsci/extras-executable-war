@@ -10,7 +10,7 @@ Breaking changes:
 * [PR #26](https://github.com/jenkinsci/extras-executable-war/pull/26) -
   Stop supporting Java 1.6 and 1.7 in the executable.
   Going forward, there will be no graceful error reporting for Java versions below Java 8.
-  Jenkins will not be affected, bercause Java 1.7 has not been supported for more than 3 years.
+  Jenkins will not be affected, because Java 1.7 has not been supported for more than 3 years.
 * [PR #27](https://github.com/jenkinsci/extras-executable-war/pull/27) - 
   Remove the `--daemon` option that is no longer used in Jenkins.
   The system `daemon` and `daemonize` should be used as a replacement.
