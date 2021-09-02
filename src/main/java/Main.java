@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
@@ -46,6 +44,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -63,7 +62,6 @@ import java.util.logging.Logger;
  */
 public class Main {
     
-    private static final String DEPENDENCIES_LIST = "WEB-INF/classes/dependencies.txt";
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
             new HashSet<>(Arrays.asList(8, 11));
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
@@ -96,34 +94,6 @@ public class Main {
      * Flag to bypass the Java version check when starting.
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
-
-    /**
-     * Reads <tt>WEB-INF/classes/dependencies.txt and builds "groupId:artifactId" -> "version" map.
-     */
-    //TODO: Bug, not a feature
-    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Legacy behavior. We do not know which encoding was used to generate WEB-INF/classes/dependencies.txt")
-    /*package*/ static Map<String,String> parseDependencyVersions() throws IOException {
-        
-        final InputStream dependenciesInputStream = Main.class.getResourceAsStream(DEPENDENCIES_LIST);
-        if (dependenciesInputStream == null) {
-            throw new IOException("Cannot find resource " + DEPENDENCIES_LIST);
-        }
-        final Map<String,String> r = new HashMap<>();
-        try {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(dependenciesInputStream))) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    line = line.trim();
-                    String[] tokens = line.split(":");
-                    if (tokens.length != 5) continue;   // there should be 5 tuples group:artifact:type:version:scope
-                    r.put(tokens[0] + ":" + tokens[1], tokens[3]);
-                }
-            }
-        } finally {
-            dependenciesInputStream.close();
-        }
-        return r;
-    }
 
     public static void main(String[] args) throws Exception {
         try {
@@ -227,33 +197,6 @@ public class Main {
             }
         }
 
-        // if we need to daemonize, do it first
-        for (String arg : args) {
-            if (arg.startsWith("--daemon")) {
-                Map<String, String> revisions = parseDependencyVersions();
-
-                // load the daemonization code
-                ClassLoader cl = new URLClassLoader(new URL[]{
-                        extractFromJar("WEB-INF/lib/jna-" + getVersion(revisions, "net.java.dev.jna", "jna") + ".jar", "jna", "jar", extractedFilesFolder).toURI().toURL(),
-                        extractFromJar("WEB-INF/lib/akuma-" + getVersion(revisions, "org.kohsuke", "akuma") + ".jar", "akuma", "jar", extractedFilesFolder).toURI().toURL(),
-                });
-                Class<?> $daemon = cl.loadClass("com.sun.akuma.Daemon");
-                Object daemon = $daemon.newInstance();
-
-                // tell the user that we'll be starting as a daemon.
-                Method isDaemonized = $daemon.getMethod("isDaemonized");
-                if (!(Boolean) isDaemonized.invoke(daemon)) {
-                    System.out.println("Forking into background to run as a daemon.");
-                    if (!hasOption(arguments, "--logfile="))
-                        System.out.println("Use --logfile to redirect output to a file");
-                }
-
-                Method m = $daemon.getMethod("all", boolean.class);
-                m.invoke(daemon, true);
-            }
-        }
-
-
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
             if(args[i].startsWith("--logfile=")) {
@@ -328,7 +271,6 @@ public class Main {
                 "   --pluginroot             = folder where the plugin archives are expanded into. Default is ${JENKINS_HOME}/plugins\n" +
                 "                              (NOTE: this option does not change the directory where the plugin archives are stored)\n" +
                 "   --extractedFilesFolder   = folder where extracted files are to be located. Default is the temp folder\n" +
-                "   --daemon                 = fork into background and run as daemon (Unix only)\n" +
                 "   --logfile                = redirect log messages to this file\n" +
                 "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (class version " + MINIMUM_JAVA_CLASS_VERSION + " and above)\n" +
                 "{OPTIONS}");
@@ -390,21 +332,10 @@ public class Main {
         in.read(buffer);
         return new String(buffer);
     }
+
     private static void trimOffOurOptions(List<String> arguments) {
         arguments.removeIf(arg -> arg.startsWith("--daemon") || arg.startsWith("--logfile") || arg.startsWith("--extractedFilesFolder")
                 || arg.startsWith("--pluginroot") || arg.startsWith(ENABLE_FUTURE_JAVA_CLI_SWITCH));
-    }
-
-    private static String getVersion(Map<String,String> revisions, String groupId, String artifactId) {
-        String v = revisions.get(groupId + ":" + artifactId);
-        if (v==null) {
-            // fall back to artifact ID only search, in case the artifact is renamed
-            for (String key : revisions.keySet()) {
-                if (key.endsWith(":" + artifactId))
-                    return v;
-            }
-        }
-        return v;
     }
 
     /**

@@ -10,14 +10,6 @@ import java.util.Map;
 @For(Main.class)
 public class MainTest {
 
-    @Test(expected = IOException.class)
-    public void shouldHaveNoStandardDependenciesFile() throws IOException {
-        final Map<String, String> versions = Main.parseDependencyVersions();
-        if (versions == null) {
-            Assert.fail("Main.parseDependencyVersions failed");
-        }
-    }
-
     @Test
     public void shouldFailForOldJava() {
         assertJavaCheckFails(51, false);
