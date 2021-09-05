@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import sun.misc.Signal;
 
 import java.io.File;
@@ -73,12 +75,12 @@ final class LogFileOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public synchronized void write(byte[] b) throws IOException {
+    public synchronized void write(@NonNull byte[] b) throws IOException {
         out.write(b);
     }
 
     @Override
-    public synchronized void write(byte[] b, int off, int len) throws IOException {
+    public synchronized void write(@NonNull byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
     }
 
@@ -112,7 +114,7 @@ final class LogFileOutputStream extends FilterOutputStream {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) {
+        public void write(@NonNull byte[] b, int off, int len) {
             // noop
         }
     };

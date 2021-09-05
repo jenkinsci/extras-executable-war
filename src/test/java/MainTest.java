@@ -1,9 +1,9 @@
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
-
-import javax.annotation.CheckForNull;
 
 @For(Main.class)
 public class MainTest {

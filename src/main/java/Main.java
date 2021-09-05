@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.Nonnull;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Context;
@@ -156,7 +156,7 @@ public class Main {
     }
 
     //TODO: Rework everything to use List
-    private static boolean hasArgument(@Nonnull String argument, @Nonnull String[] args) {
+    private static boolean hasArgument(@NonNull String argument, @NonNull String[] args) {
         for (String arg : args) {
             if (argument.equals(arg)) {
                 return true;
