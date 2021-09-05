@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;

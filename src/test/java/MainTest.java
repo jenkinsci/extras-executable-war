@@ -4,8 +4,6 @@ import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
 
 import javax.annotation.CheckForNull;
-import java.io.IOException;
-import java.util.Map;
 
 @For(Main.class)
 public class MainTest {
