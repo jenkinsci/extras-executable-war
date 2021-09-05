@@ -11,6 +11,7 @@ import java.util.logging.SimpleFormatter;
  * @author Kohsuke Kawaguchi
  */
 public class ColorFormatter extends SimpleFormatter {
+    @Override
     public String format(LogRecord record) {
         String body = super.format(record);
         int v = record.getLevel().intValue();

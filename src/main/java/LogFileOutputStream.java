@@ -72,26 +72,32 @@ final class LogFileOutputStream extends FilterOutputStream {
         out = new FileOutputStream(file,true);
     }
 
+    @Override
     public synchronized void write(byte[] b) throws IOException {
         out.write(b);
     }
 
+    @Override
     public synchronized void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
     }
 
+    @Override
     public synchronized void flush() throws IOException {
         out.flush();
     }
 
+    @Override
     public synchronized void close() throws IOException {
         out.close();
     }
 
+    @Override
     public synchronized void write(int b) throws IOException {
         out.write(b);
     }
 
+    @Override
     public String toString() {
         return getClass().getName()+" -> "+file;
     }
@@ -100,10 +106,12 @@ final class LogFileOutputStream extends FilterOutputStream {
      * /dev/null
      */
     private static final OutputStream NULL = new OutputStream() {
+        @Override
         public void write(int b) {
             // noop
         }
 
+        @Override
         public void write(byte[] b, int off, int len) {
             // noop
         }
