@@ -423,9 +423,8 @@ public class Main {
      * Search contents to delete in a folder that match with some patterns.
      * @param folder folder where the contents are.
      * @param patterns patterns that identifies the contents to search.
-     * @throws IOException in case of error deleting contents.
      */
-    private static void deleteContentsFromFolder(File folder, final String...patterns) throws IOException {
+    private static void deleteContentsFromFolder(File folder, final String...patterns) {
         File[]  files = folder.listFiles();
 
         if(files != null){
@@ -440,7 +439,7 @@ public class Main {
         }
     }
 
-    private static void deleteWinstoneTempContents(File file) throws IOException {
+    private static void deleteWinstoneTempContents(File file) {
         if (!file.exists()) {
             LOGGER.log(Level.FINEST, "No file found at {0}, nothing to delete.", file);
             return;

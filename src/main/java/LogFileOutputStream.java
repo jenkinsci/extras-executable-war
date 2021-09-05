@@ -101,11 +101,11 @@ final class LogFileOutputStream extends FilterOutputStream {
      * /dev/null
      */
     private static final OutputStream NULL = new OutputStream() {
-        public void write(int b) throws IOException {
+        public void write(int b) {
             // noop
         }
 
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) {
             // noop
         }
     };
