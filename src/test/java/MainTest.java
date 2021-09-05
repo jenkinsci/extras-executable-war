@@ -53,8 +53,8 @@ public class MainTest {
             Main.verifyJavaVersion(classVersion, enableFutureJava);
         } catch (Error error) {
             failed = true;
-            System.out.println(String.format("Java class version check failed as it was expected for Java class version %s.0 and enableFutureJava=%s",
-                classVersion, enableFutureJava));
+            System.out.printf("Java class version check failed as it was expected for Java class version %s.0 and enableFutureJava=%s%n",
+                classVersion, enableFutureJava);
             error.printStackTrace(System.out);
         }
 

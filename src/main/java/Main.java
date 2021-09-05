@@ -110,10 +110,9 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println(String.format(
-                    "Jenkins requires Java versions %s but you are running with Java %s from %s",
-                    SUPPORTED_JAVA_VERSIONS, System.getProperty("java.specification.version"), System.getProperty("java.home"))
-            );
+            System.err.printf(
+                    "Jenkins requires Java versions %s but you are running with Java %s from %s%n",
+                    SUPPORTED_JAVA_VERSIONS, System.getProperty("java.specification.version"), System.getProperty("java.home"));
             e.printStackTrace();
         }
     }
