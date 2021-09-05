@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 
 /**
  * {@link OutputStream} that writes to a log file.
@@ -62,7 +63,7 @@ final class LogFileOutputStream extends FilterOutputStream {
                 try {
                     reopen();
                 } catch (IOException e) {
-                    throw new Error(e); // failed to reopen
+                    throw new UncheckedIOException(e); // failed to reopen
                 }
             });
         }
