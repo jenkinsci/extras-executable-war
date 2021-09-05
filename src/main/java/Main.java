@@ -460,8 +460,8 @@ public class Main {
 
     /** Add some metadata to a File, allowing to trace setup issues */
     private static class FileAndDescription {
-        File file;
-        String description;
+        final File file;
+        final String description;
         public FileAndDescription(File file,String description) {
             this.file = file;
             this.description = description;
