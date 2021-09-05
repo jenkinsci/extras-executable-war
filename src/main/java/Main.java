@@ -404,7 +404,7 @@ public class Main {
         try {
             tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
-            String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
+            String tmpdir = directory == null ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
             throw new IOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
         try (InputStream is = res.openStream();
