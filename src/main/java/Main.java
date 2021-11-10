@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.Nonnull;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Context;
@@ -44,9 +44,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.jar.JarFile;
@@ -113,10 +110,9 @@ public class Main {
 
             _main(args);
         } catch (UnsupportedClassVersionError e) {
-            System.err.println(String.format(
-                    "Jenkins requires Java versions %s but you are running with Java %s from %s",
-                    SUPPORTED_JAVA_VERSIONS, System.getProperty("java.specification.version"), System.getProperty("java.home"))
-            );
+            System.err.printf(
+                    "Jenkins requires Java versions %s but you are running with Java %s from %s%n",
+                    SUPPORTED_JAVA_VERSIONS, System.getProperty("java.specification.version"), System.getProperty("java.home"));
             e.printStackTrace();
         }
     }
@@ -160,7 +156,7 @@ public class Main {
     }
 
     //TODO: Rework everything to use List
-    private static boolean hasArgument(@Nonnull String argument, @Nonnull String[] args) {
+    private static boolean hasArgument(@NonNull String argument, @NonNull String[] args) {
         for (String arg : args) {
             if (argument.equals(arg)) {
                 return true;
@@ -408,7 +404,7 @@ public class Main {
         try {
             tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
-            String tmpdir = (directory == null) ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
+            String tmpdir = directory == null ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
             throw new IOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
         try (InputStream is = res.openStream();
@@ -423,9 +419,8 @@ public class Main {
      * Search contents to delete in a folder that match with some patterns.
      * @param folder folder where the contents are.
      * @param patterns patterns that identifies the contents to search.
-     * @throws IOException in case of error deleting contents.
      */
-    private static void deleteContentsFromFolder(File folder, final String...patterns) throws IOException {
+    private static void deleteContentsFromFolder(File folder, final String...patterns) {
         File[]  files = folder.listFiles();
 
         if(files != null){
@@ -440,7 +435,7 @@ public class Main {
         }
     }
 
-    private static void deleteWinstoneTempContents(File file) throws IOException {
+    private static void deleteWinstoneTempContents(File file) {
         if (!file.exists()) {
             LOGGER.log(Level.FINEST, "No file found at {0}, nothing to delete.", file);
             return;
@@ -460,8 +455,8 @@ public class Main {
 
     /** Add some metadata to a File, allowing to trace setup issues */
     private static class FileAndDescription {
-        File file;
-        String description;
+        final File file;
+        final String description;
         public FileAndDescription(File file,String description) {
             this.file = file;
             this.description = description;

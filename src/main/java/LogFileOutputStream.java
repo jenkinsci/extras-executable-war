@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 
 /**
  * {@link OutputStream} that writes to a log file.
@@ -61,7 +63,7 @@ final class LogFileOutputStream extends FilterOutputStream {
                 try {
                     reopen();
                 } catch (IOException e) {
-                    throw new Error(e); // failed to reopen
+                    throw new UncheckedIOException(e); // failed to reopen
                 }
             });
         }
@@ -73,26 +75,32 @@ final class LogFileOutputStream extends FilterOutputStream {
         out = new FileOutputStream(file,true);
     }
 
-    public synchronized void write(byte[] b) throws IOException {
+    @Override
+    public synchronized void write(@NonNull byte[] b) throws IOException {
         out.write(b);
     }
 
-    public synchronized void write(byte[] b, int off, int len) throws IOException {
+    @Override
+    public synchronized void write(@NonNull byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
     }
 
+    @Override
     public synchronized void flush() throws IOException {
         out.flush();
     }
 
+    @Override
     public synchronized void close() throws IOException {
         out.close();
     }
 
+    @Override
     public synchronized void write(int b) throws IOException {
         out.write(b);
     }
 
+    @Override
     public String toString() {
         return getClass().getName()+" -> "+file;
     }
@@ -101,11 +109,13 @@ final class LogFileOutputStream extends FilterOutputStream {
      * /dev/null
      */
     private static final OutputStream NULL = new OutputStream() {
-        public void write(int b) throws IOException {
+        @Override
+        public void write(int b) {
             // noop
         }
 
-        public void write(byte[] b, int off, int len) throws IOException {
+        @Override
+        public void write(@NonNull byte[] b, int off, int len) {
             // noop
         }
     };

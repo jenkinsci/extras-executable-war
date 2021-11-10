@@ -1,11 +1,9 @@
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
-
-import javax.annotation.CheckForNull;
-import java.io.IOException;
-import java.util.Map;
 
 @For(Main.class)
 public class MainTest {
@@ -55,8 +53,8 @@ public class MainTest {
             Main.verifyJavaVersion(classVersion, enableFutureJava);
         } catch (Error error) {
             failed = true;
-            System.out.println(String.format("Java class version check failed as it was expected for Java class version %s.0 and enableFutureJava=%s",
-                classVersion, enableFutureJava));
+            System.out.printf("Java class version check failed as it was expected for Java class version %s.0 and enableFutureJava=%s%n",
+                classVersion, enableFutureJava);
             error.printStackTrace(System.out);
         }
 

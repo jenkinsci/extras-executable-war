@@ -11,6 +11,7 @@ import java.util.logging.SimpleFormatter;
  * @author Kohsuke Kawaguchi
  */
 public class ColorFormatter extends SimpleFormatter {
+    @Override
     public String format(LogRecord record) {
         String body = super.format(record);
         int v = record.getLevel().intValue();
@@ -32,9 +33,9 @@ public class ColorFormatter extends SimpleFormatter {
 
         Handler[] handlers = Logger.getLogger("").getHandlers();
         for (Handler h : handlers) {
-            if (h.getClass() == ConsoleHandler.class) {
-                if (h.getFormatter().getClass() == SimpleFormatter.class)
-                    h.setFormatter(new ColorFormatter());
+            if (h.getClass() == ConsoleHandler.class
+                    && h.getFormatter().getClass() == SimpleFormatter.class) {
+                h.setFormatter(new ColorFormatter());
             }
         }
     }
