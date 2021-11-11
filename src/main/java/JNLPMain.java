@@ -25,7 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
- * Launches <tt>hudson.war</tt> from JNLP.
+ * Launches {@code hudson.war} from JNLP.
  *
  * @author Kohsuke Kawaguchi
  */

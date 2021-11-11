@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 
 /**
  * Launcher class for stand-alone execution of Jenkins as
- * <tt>java -jar jenkins.war</tt>.
+ * {@code java -jar jenkins.war}.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -358,7 +358,7 @@ public class Main {
     }
 
     /**
-     * Figures out the URL of <tt>jenkins.war</tt>.
+     * Figures out the URL of {@code jenkins.war}.
      */
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN", "URLCONNECTION_SSRF_FD"}, justification = "User provided values for running the program.")
     public static File whoAmI(File directory) throws IOException {
