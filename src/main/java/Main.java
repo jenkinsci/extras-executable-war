@@ -59,11 +59,14 @@ import java.util.logging.Logger;
  */
 public class Main {
     
+    private static final int MINIMUM_JAVA_VERSION = 8;
+    private static final int RECOMMENDED_JAVA_VERSION = 11;
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
-            new HashSet<>(Arrays.asList(8, 11));
-    private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
-            new HashSet<>(Arrays.asList(52, 55));
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_VERSION, RECOMMENDED_JAVA_VERSION));
     private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
+    private static final int RECOMMENDED_JAVA_CLASS_VERSION = 55;
+    private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, RECOMMENDED_JAVA_CLASS_VERSION));
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     
@@ -121,7 +124,16 @@ public class Main {
             throws Error {
         final String displayVersion = String.format("%d.0", javaClassVersion);
         if (SUPPORTED_JAVA_CLASS_VERSIONS.contains(javaClassVersion)) {
-            // Fine
+            if (javaClassVersion < RECOMMENDED_JAVA_CLASS_VERSION) {
+                LOGGER.log(
+                        Level.WARNING,
+                        String.format(
+                                "You are running Jenkins on Java %s, support for which will"
+                                    + " end on or after June 14, 2022. Please refer to the"
+                                    + " documentation for details on upgrading to Java 11:"
+                                    + " https://www.jenkins.io/redirect/upgrading-jenkins-java-version-8-to-11",
+                                System.getProperty("java.specification.version")));
+            }
         } else if (javaClassVersion > MINIMUM_JAVA_CLASS_VERSION) {
             if (enableFutureJava) {
                 LOGGER.log(Level.WARNING,
