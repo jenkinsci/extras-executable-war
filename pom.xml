@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>executable-war</artifactId>
   <name>Executable War 'header'</name>
-  <version>${revision}${changelist}</version>
+  <version>2.3</version>
   <description>Defines the main() method for a self-contained web application that kickstarts
     embedded Winstone and runs a web application without needing a servlet container.</description>
   <url>https://github.com/jenkinsci/extras-${project.artifactId}</url>
@@ -25,7 +25,7 @@
     <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
     <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
     <url>https://github.com/${gitHubRepo}</url>
-    <tag>${scmTag}</tag>
+    <tag>executable-war-2.3</tag>
   </scm>
 
   <dependencies>
