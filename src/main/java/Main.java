@@ -126,7 +126,7 @@ public class Main {
                         Level.WARNING,
                         String.format(
                                 "You are running Jenkins on Java %s, support for which will"
-                                    + " end on or after June 14, 2022. Please refer to the"
+                                    + " end on or after September 1, 2022. Please refer to the"
                                     + " documentation for details on upgrading to Java 11:"
                                     + " https://www.jenkins.io/redirect/upgrading-jenkins-java-version-8-to-11",
                                 System.getProperty("java.specification.version")));
