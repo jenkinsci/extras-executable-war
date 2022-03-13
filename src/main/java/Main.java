@@ -25,9 +25,6 @@
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.Context;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -485,24 +482,7 @@ public class Main {
      */
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
     private static FileAndDescription getHomeDir() {
-        // check JNDI for the home directory first
-        for (String name : HOME_NAMES) {
-            try {
-                InitialContext iniCtxt = new InitialContext();
-                Context env = (Context) iniCtxt.lookup("java:comp/env");
-                String value = (String) env.lookup(name);
-                if (value != null && value.trim().length() > 0)
-                    return new FileAndDescription(new File(value.trim()), "JNDI/java:comp/env/" + name);
-                // look at one more place. See issue #1314
-                value = (String) iniCtxt.lookup(name);
-                if (value != null && value.trim().length() > 0)
-                    return new FileAndDescription(new File(value.trim()), "JNDI/" + name);
-            } catch (NamingException e) {
-                // ignore
-            }
-        }
-
-        // next the system property
+        // check the system property for the home directory first
         for (String name : HOME_NAMES) {
             String sysProp = System.getProperty(name);
             if (sysProp != null)

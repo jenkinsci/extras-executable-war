@@ -1,39 +1,44 @@
-<?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.69</version>
+    <version>1.72</version>
     <relativePath />
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>executable-war</artifactId>
-  <name>Executable War 'header'</name>
   <version>${revision}${changelist}</version>
+  <name>Executable War 'header'</name>
   <description>Defines the main() method for a self-contained web application that kickstarts
     embedded Winstone and runs a web application without needing a servlet container.</description>
   <url>https://github.com/jenkinsci/extras-${project.artifactId}</url>
 
+  <licenses>
+    <license>
+      <name>The MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/${gitHubRepo}</url>
+  </scm>
+
   <properties>
-    <revision>2.3</revision>
+    <revision>2.4</revision>
     <changelist>-SNAPSHOT</changelist>
     <java.level>8</java.level>
     <gitHubRepo>jenkinsci/extras-${project.artifactId}</gitHubRepo>
   </properties>
 
-  <scm>
-    <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
-    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
-    <url>https://github.com/${gitHubRepo}</url>
-    <tag>${scmTag}</tag>
-  </scm>
-
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
@@ -44,6 +49,11 @@
           <artifactId>jsr305</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci</groupId>
@@ -66,11 +76,27 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <licenses>
-    <license>
-      <name>The MIT license</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+  <profiles>
+    <profile>
+      <id>jdk-above-9</id>
+      <activation>
+        <jdk>[1.9,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <!--
+                Work around JDK-8206937 by clearing the release=8 flag.
+                When we drop support for Java 8, this should be deleted.
+              -->
+              <release combine.self="override" />
+              <testRelease combine.self="override" />
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
