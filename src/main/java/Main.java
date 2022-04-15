@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -89,7 +90,7 @@ public class Main {
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IllegalAccessException, InvocationTargetException, IOException {
         try {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
@@ -114,8 +115,7 @@ public class Main {
         }
     }
 
-    /*package*/ static void verifyJavaVersion(int javaClassVersion, boolean enableFutureJava)
-            throws Error {
+    /*package*/ static void verifyJavaVersion(int javaClassVersion, boolean enableFutureJava) {
         final String displayVersion = String.format("%d.0", javaClassVersion);
         if (SUPPORTED_JAVA_CLASS_VERSIONS.contains(javaClassVersion)) {
             // Fine
@@ -163,7 +163,7 @@ public class Main {
     }
 
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
-    private static void _main(String[] args) throws Exception {
+    private static void _main(String[] args) throws IllegalAccessException, InvocationTargetException, IOException {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
         if (hasArgument("--paramsFromStdIn", args)) {
@@ -251,11 +251,22 @@ public class Main {
                 
         // locate the Winstone launcher
         ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
-        Class<?> launcher = cl.loadClass("winstone.Launcher");
-        Method mainMethod = launcher.getMethod("main", String[].class);
+        Class<?> launcher;
+        Method mainMethod;
+        try {
+            launcher = cl.loadClass("winstone.Launcher");
+            mainMethod = launcher.getMethod("main", String[].class);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            throw new AssertionError(e);
+        }
 
         // override the usage screen
-        Field usage = launcher.getField("USAGE");
+        Field usage;
+        try {
+            usage = launcher.getField("USAGE");
+        } catch (NoSuchFieldException e) {
+            throw new AssertionError(e);
+        }
         usage.set(null,"Jenkins Automation Server Engine "+getVersion("")+"\n" +
                 "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
@@ -294,8 +305,8 @@ public class Main {
                     // Randomize session names by default to prevent collisions when running multiple Jenkins instances on the same host.
                     f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
                 }
-            } catch (ClassNotFoundException e) {
-                // early versions of Winstone 2.x didn't have this
+            } catch (ClassNotFoundException | NoSuchFieldException e) {
+                throw new AssertionError(e);
             }
         }
 
