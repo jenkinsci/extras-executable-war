@@ -26,15 +26,18 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -90,7 +93,7 @@ public class Main {
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
 
-    public static void main(String[] args) throws IllegalAccessException, InvocationTargetException, IOException {
+    public static void main(String[] args) throws IllegalAccessException, InvocationTargetException {
         try {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
@@ -163,7 +166,7 @@ public class Main {
     }
 
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
-    private static void _main(String[] args) throws IllegalAccessException, InvocationTargetException, IOException {
+    private static void _main(String[] args) throws IllegalAccessException, InvocationTargetException {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
         if (hasArgument("--paramsFromStdIn", args)) {
@@ -243,14 +246,24 @@ public class Main {
         // clean up any previously extracted copy, since
         // winstone doesn't do so and that causes problems when newer version of Jenkins
         // is deployed.
-        File tempFile = File.createTempFile("dummy", "dummy");
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("dummy", "dummy");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         deleteWinstoneTempContents(new File(tempFile.getParent(), "winstone/" + me.getName()));
         if (!tempFile.delete()) {
             LOGGER.log(Level.WARNING, "Failed to delete the temporary file {0}", tempFile);
         }
                 
         // locate the Winstone launcher
-        ClassLoader cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
+        ClassLoader cl;
+        try {
+            cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
+        } catch (MalformedURLException e) {
+            throw new UncheckedIOException(e);
+        }
         Class<?> launcher;
         Method mainMethod;
         try {
@@ -316,8 +329,13 @@ public class Main {
     }
 
     @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "--logfile relies on the default encoding, fine")
-    private static PrintStream createLogFileStream(File file) throws IOException {
-        LogFileOutputStream los = new LogFileOutputStream(file);
+    private static PrintStream createLogFileStream(File file) {
+        LogFileOutputStream los;
+        try {
+            los = new LogFileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new UncheckedIOException(e);
+        }
         return new PrintStream(los);
     }
 
@@ -328,12 +346,16 @@ public class Main {
      * @param in input stream to be read
      * @param maxToRead maximum number of bytes to read from the in
      * @return a String read from in
-     * @throws IOException when reading in caused it
      */
     @SuppressFBWarnings(value = {"DM_DEFAULT_ENCODING", "RR_NOT_CHECKED"}, justification = "Legacy behavior, We expect less input than maxToRead")
-    private static String readStringNonBlocking(InputStream in, int maxToRead) throws IOException {
-        byte [] buffer = new byte[Math.min(in.available(), maxToRead)];
-        in.read(buffer);
+    private static String readStringNonBlocking(InputStream in, int maxToRead) {
+        byte[] buffer;
+        try {
+            buffer = new byte[Math.min(in.available(), maxToRead)];
+            in.read(buffer);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return new String(buffer);
     }
 
@@ -345,7 +367,8 @@ public class Main {
     /**
      * Figures out the version from the manifest.
      */
-    private static String getVersion(String fallback) throws IOException {
+    private static String getVersion(String fallback) {
+      try {
         Enumeration<URL> manifests = Main.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
         while (manifests.hasMoreElements()) {
             URL res = manifests.nextElement();
@@ -354,7 +377,10 @@ public class Main {
             if(v!=null)
                 return v;
         }
-        return fallback;
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+      return fallback;
     }
 
     private static boolean hasOption(List<String> args, String prefix) {
@@ -369,7 +395,7 @@ public class Main {
      * Figures out the URL of {@code jenkins.war}.
      */
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN", "URLCONNECTION_SSRF_FD"}, justification = "User provided values for running the program.")
-    public static File whoAmI(File directory) throws IOException {
+    public static File whoAmI(File directory) {
         // JNLP returns the URL where the jar was originally placed (like http://jenkins-ci.org/...)
         // not the local cached file. So we need a rather round about approach to get to
         // the local file name.
@@ -382,11 +408,18 @@ public class Main {
         } catch (Exception x) {
             System.err.println("ZipFile.name trick did not work, using fallback: " + x);
         }
-        File myself = File.createTempFile("jenkins", ".jar", directory);
+        File myself;
+        try {
+            myself = File.createTempFile("jenkins", ".jar", directory);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         myself.deleteOnExit();
         try (InputStream is = Main.class.getProtectionDomain().getCodeSource().getLocation().openStream();
              OutputStream os = new FileOutputStream(myself)) {
             copyStream(is, os);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
         return myself;
     }
@@ -402,10 +435,10 @@ public class Main {
      * Extract a resource from jar, mark it for deletion upon exit, and return its location.
      */
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
-    private static File extractFromJar(String resource, String fileName, String suffix, File directory) throws IOException {
+    private static File extractFromJar(String resource, String fileName, String suffix, File directory) {
         URL res = Main.class.getResource(resource);
         if (res==null)
-            throw new IOException("Unable to find the resource: "+resource); 
+            throw new RuntimeException("Unable to find the resource: " + resource);
 
         // put this jar in a file system so that we can load jars from there
         File tmp;
@@ -413,11 +446,13 @@ public class Main {
             tmp = File.createTempFile(fileName,suffix,directory);
         } catch (IOException e) {
             String tmpdir = directory == null ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
-            throw new IOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
+            throw new UncheckedIOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
         try (InputStream is = res.openStream();
              OutputStream os = new FileOutputStream(tmp)) {
             copyStream(is, os);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
         tmp.deleteOnExit();
         return tmp;
