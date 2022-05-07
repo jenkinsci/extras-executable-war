@@ -102,7 +102,7 @@
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
-              <doclint>none</doclint>
+              <skip>true</skip>
             </configuration>
           </plugin>
         </plugins>
