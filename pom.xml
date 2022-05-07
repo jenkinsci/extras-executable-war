@@ -77,6 +77,10 @@
   </pluginRepositories>
 
   <profiles>
+    <!--
+      Work around JDK-8206937 by clearing the release=8 flag.
+      When we drop support for Java 8, this should be deleted.
+    -->
     <profile>
       <id>jdk-9-and-above</id>
       <activation>
@@ -87,16 +91,18 @@
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-              <!--
-                Work around JDK-8206937 by clearing the release=8 flag.
-                When we drop support for Java 8, this should be deleted.
-              -->
               <source>1.8</source>
               <target>1.8</target>
               <testSource>1.8</testSource>
               <testTarget>1.8</testTarget>
               <release combine.self="override" />
               <testRelease combine.self="override" />
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <doclint>all,-missing</doclint>
             </configuration>
           </plugin>
         </plugins>
