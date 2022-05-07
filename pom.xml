@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.72</version>
+    <version>1.74</version>
     <relativePath />
   </parent>
 
@@ -77,22 +77,32 @@
   </pluginRepositories>
 
   <profiles>
+    <!--
+      Work around JDK-8206937 by clearing the release=8 flag.
+      When we drop support for Java 8, this should be deleted.
+    -->
     <profile>
-      <id>jdk-above-9</id>
+      <id>jdk-9-and-above</id>
       <activation>
-        <jdk>[1.9,)</jdk>
+        <jdk>[9,)</jdk>
       </activation>
       <build>
         <plugins>
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-              <!--
-                Work around JDK-8206937 by clearing the release=8 flag.
-                When we drop support for Java 8, this should be deleted.
-              -->
+              <source>1.8</source>
+              <target>1.8</target>
+              <testSource>1.8</testSource>
+              <testTarget>1.8</testTarget>
               <release combine.self="override" />
               <testRelease combine.self="override" />
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
             </configuration>
           </plugin>
         </plugins>
