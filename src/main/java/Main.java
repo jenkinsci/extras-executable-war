@@ -96,7 +96,7 @@ public class Main {
      */
     private static final String ENABLE_FUTURE_JAVA_CLI_SWITCH = "--enable-future-java";
 
-    public static void main(String[] args) throws IllegalAccessException, InvocationTargetException {
+    public static void main(String[] args) throws IllegalAccessException {
         try {
             String v = System.getProperty("java.class.version");
             if (v!=null) {
@@ -176,7 +176,7 @@ public class Main {
     }
 
     @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
-    private static void _main(String[] args) throws IllegalAccessException, InvocationTargetException {
+    private static void _main(String[] args) throws IllegalAccessException {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
         if (hasArgument("--paramsFromStdIn", args)) {
@@ -335,7 +335,22 @@ public class Main {
 
         // run
         Thread.currentThread().setContextClassLoader( cl );
-        mainMethod.invoke(null,new Object[]{arguments.toArray(new String[0])});
+        try {
+            mainMethod.invoke(null, new Object[]{arguments.toArray(new String[0])});
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            } else if (t instanceof IOException) {
+                throw new UncheckedIOException((IOException) t);
+            } else if (t instanceof Exception) {
+                throw new RuntimeException(t);
+            } else if (t instanceof Error) {
+                throw (Error) t;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "--logfile relies on the default encoding, fine")
