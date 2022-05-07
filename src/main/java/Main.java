@@ -110,8 +110,6 @@ public class Main {
                 }
             }
 
-            ColorFormatter.install();
-
             _main(args);
         } catch (UnsupportedClassVersionError e) {
             System.err.printf(
