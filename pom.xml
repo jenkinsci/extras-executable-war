@@ -102,7 +102,7 @@
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
-              <doclint>all,-missing</doclint>
+              <doclint>none</doclint>
             </configuration>
           </plugin>
         </plugins>
