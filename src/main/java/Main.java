@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,9 +33,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class Main {
-    
+
     private static final int MINIMUM_JAVA_VERSION = 8;
     private static final int RECOMMENDED_JAVA_VERSION = 11;
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
@@ -70,25 +70,25 @@ public class Main {
             new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, RECOMMENDED_JAVA_CLASS_VERSION));
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    
+
     /**
      * Sets custom session cookie name.
      * It may be used to prevent randomization of JSESSIONID cookies and issues like
      * <a href="https://issues.jenkins-ci.org/browse/JENKINS-25046">JENKINS-25046</a>.
      * @since TODO
      */
-    private static final String JSESSIONID_COOKIE_NAME = 
+    private static final String JSESSIONID_COOKIE_NAME =
             System.getProperty("executableWar.jetty.sessionIdCookieName");
-    
+
     /**
      * Disables usage of the custom cookie names when starting the WAR file.
      * If the flag is specified, the session ID will be defined by the internal Jetty logic.
-     * In such case it becomes configurable via 
+     * In such case it becomes configurable via
      * <a href="http://www.eclipse.org/jetty/documentation/9.4.x/jetty-xml-config.html">Jetty XML Config file</a>>
      * or via system properties.
      * @since TODO
      */
-    private static final boolean DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME = 
+    private static final boolean DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME =
             Boolean.getBoolean("executableWar.jetty.disableCustomSessionIdCookieName");
 
     /**
@@ -99,7 +99,7 @@ public class Main {
     public static void main(String[] args) throws IllegalAccessException {
         try {
             String v = System.getProperty("java.class.version");
-            if (v!=null) {
+            if (v != null) {
                 String classVersionString = v.split("\\.")[0];
                 try {
                     int javaVersion = Integer.parseInt(classVersionString);
@@ -159,13 +159,14 @@ public class Main {
 
     /**
      * Returns true if the Java runtime version check should not be done, and any version allowed.
+     *
      * @see #ENABLE_FUTURE_JAVA_CLI_SWITCH
      */
     private static boolean isFutureJavaEnabled(String[] args) {
         return hasArgument(ENABLE_FUTURE_JAVA_CLI_SWITCH, args) || Boolean.parseBoolean(System.getenv("JENKINS_ENABLE_FUTURE_JAVA"));
     }
 
-    //TODO: Rework everything to use List
+    // TODO: Rework everything to use List
     private static boolean hasArgument(@NonNull String argument, @NonNull String[] args) {
         for (String arg : args) {
             if (argument.equals(arg)) {
@@ -175,13 +176,13 @@ public class Main {
         return false;
     }
 
-    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "User provided values for running the program.")
     private static void _main(String[] args) throws IllegalAccessException {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
         if (hasArgument("--paramsFromStdIn", args)) {
             System.out.println("--paramsFromStdIn detected. Parameters are going to be read from stdin. Other parameters passed directly will be ignored.");
-            String argsInStdIn = readStringNonBlocking(System.in,131072).trim();
+            String argsInStdIn = readStringNonBlocking(System.in, 131072).trim();
             args = argsInStdIn.split(" +");
         }
         // If someone just wants to know the version, print it out as soon as possible, with no extraneous file or webroot info.
@@ -205,7 +206,7 @@ public class Main {
 
         // if the output should be redirect to a file, do it now
         for (int i = 0; i < args.length; i++) {
-            if(args[i].startsWith("--logfile=")) {
+            if (args[i].startsWith("--logfile=")) {
                 PrintStream ps = createLogFileStream(new File(args[i].substring("--logfile=".length())));
                 System.setOut(ps);
                 System.setErr(ps);
@@ -225,32 +226,31 @@ public class Main {
             }
         }
 
-
         // this is so that JFreeChart can work nicely even if we are launched as a daemon
-        System.setProperty("java.awt.headless","true");
+        System.setProperty("java.awt.headless", "true");
 
         File me = whoAmI(extractedFilesFolder);
         System.out.println("Running from: " + me);
-        System.setProperty("executable-war",me.getAbsolutePath());  // remember the location so that we can access it from within webapp
+        System.setProperty("executable-war", me.getAbsolutePath());  // remember the location so that we can access it from within webapp
 
         // figure out the arguments
         trimOffOurOptions(arguments);
-        arguments.add(0,"--warfile="+ me.getAbsolutePath());
-        if(!hasOption(arguments, "--webroot=")) {
+        arguments.add(0, "--warfile=" + me.getAbsolutePath());
+        if (!hasOption(arguments, "--webroot=")) {
             // defaults to ~/.jenkins/war since many users reported that cron job attempts to clean up
             // the contents in the temporary directory.
             final FileAndDescription describedHomeDir = getHomeDir();
             System.out.println("webroot: " + describedHomeDir.description);
-            arguments.add("--webroot="+new File(describedHomeDir.file,"war"));
+            arguments.add("--webroot=" + new File(describedHomeDir.file, "war"));
         }
 
-        //only do a cleanup if you set the extractedFilesFolder property.
-        if(extractedFilesFolder != null) {
+        // only do a cleanup if you set the extractedFilesFolder property.
+        if (extractedFilesFolder != null) {
             deleteContentsFromFolder(extractedFilesFolder, "winstone.*\\.jar");
         }
 
         // put winstone jar in a file system so that we can load jars from there
-        File tmpJar = extractFromJar("winstone.jar","winstone",".jar", extractedFilesFolder);
+        File tmpJar = extractFromJar("winstone.jar", "winstone", ".jar", extractedFilesFolder);
         tmpJar.deleteOnExit();
 
         // clean up any previously extracted copy, since
@@ -266,11 +266,11 @@ public class Main {
         if (!tempFile.delete()) {
             LOGGER.log(Level.WARNING, "Failed to delete the temporary file {0}", tempFile);
         }
-                
+
         // locate the Winstone launcher
         ClassLoader cl;
         try {
-            cl = new URLClassLoader(new URL[]{tmpJar.toURI().toURL()});
+            cl = new URLClassLoader(new URL[] {tmpJar.toURI().toURL()});
         } catch (MalformedURLException e) {
             throw new UncheckedIOException(e);
         }
@@ -290,7 +290,7 @@ public class Main {
         } catch (NoSuchFieldException e) {
             throw new AssertionError(e);
         }
-        usage.set(null,"Jenkins Automation Server Engine "+getVersion("")+"\n" +
+        usage.set(null, "Jenkins Automation Server Engine " + getVersion("") + "\n" +
                 "Usage: java -jar jenkins.war [--option=value] [--option=value]\n" +
                 "\n" +
                 "Options:\n" +
@@ -302,7 +302,6 @@ public class Main {
                 "   " + ENABLE_FUTURE_JAVA_CLI_SWITCH + "     = allows running with new Java versions which are not fully supported (class version " + MINIMUM_JAVA_CLASS_VERSION + " and above)\n" +
                 "{OPTIONS}");
 
-        
         if (!DISABLE_CUSTOM_JSESSIONID_COOKIE_NAME) {
             /*
              Set an unique cookie name.
@@ -326,7 +325,7 @@ public class Main {
                     f.set(null, JSESSIONID_COOKIE_NAME);
                 } else {
                     // Randomize session names by default to prevent collisions when running multiple Jenkins instances on the same host.
-                    f.set(null,"JSESSIONID."+UUID.randomUUID().toString().replace("-","").substring(0,8));
+                    f.set(null, "JSESSIONID." + UUID.randomUUID().toString().replace("-", "").substring(0, 8));
                 }
             } catch (ClassNotFoundException | NoSuchFieldException e) {
                 throw new AssertionError(e);
@@ -334,9 +333,9 @@ public class Main {
         }
 
         // run
-        Thread.currentThread().setContextClassLoader( cl );
+        Thread.currentThread().setContextClassLoader(cl);
         try {
-            mainMethod.invoke(null, new Object[]{arguments.toArray(new String[0])});
+            mainMethod.invoke(null, new Object[] {arguments.toArray(new String[0])});
         } catch (InvocationTargetException e) {
             Throwable t = e.getCause();
             if (t instanceof RuntimeException) {
@@ -364,7 +363,7 @@ public class Main {
         return new PrintStream(los);
     }
 
-    //TODO: Get rid of FB warning after updating to Java 7
+    // TODO: Get rid of FB warning after updating to Java 7
     /**
      * reads up to maxRead bytes from InputStream if available into a String
      *
@@ -399,8 +398,9 @@ public class Main {
             URL res = manifests.nextElement();
             Manifest manifest = new Manifest(res.openStream());
             String v = manifest.getMainAttributes().getValue("Jenkins-Version");
-            if(v!=null)
+            if (v != null) {
                 return v;
+            }
         }
       } catch (IOException e) {
         throw new UncheckedIOException(e);
@@ -410,8 +410,9 @@ public class Main {
 
     private static boolean hasOption(List<String> args, String prefix) {
         for (String s : args) {
-            if (s.startsWith(prefix))
+            if (s.startsWith(prefix)) {
                 return true;
+            }
         }
         return false;
     }
@@ -452,29 +453,30 @@ public class Main {
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
         byte[] buf = new byte[8192];
         int len;
-        while((len=in.read(buf))>0)
-            out.write(buf,0,len);
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
     }
 
     /**
      * Extract a resource from jar, mark it for deletion upon exit, and return its location.
      */
-    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "User provided values for running the program.")
     private static File extractFromJar(String resource, String fileName, String suffix, File directory) {
         URL res = Main.class.getResource(resource);
-        if (res==null)
+        if (res == null) {
             throw new RuntimeException("Unable to find the resource: " + resource);
+        }
 
         // put this jar in a file system so that we can load jars from there
         File tmp;
         try {
-            tmp = File.createTempFile(fileName,suffix,directory);
+            tmp = File.createTempFile(fileName, suffix, directory);
         } catch (IOException e) {
             String tmpdir = directory == null ? System.getProperty("java.io.tmpdir") : directory.getAbsolutePath();
             throw new UncheckedIOException("Jenkins failed to create a temporary file in " + tmpdir + ": " + e, e);
         }
-        try (InputStream is = res.openStream();
-             OutputStream os = new FileOutputStream(tmp)) {
+        try (InputStream is = res.openStream(); OutputStream os = new FileOutputStream(tmp)) {
             copyStream(is, os);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -485,16 +487,17 @@ public class Main {
 
     /**
      * Search contents to delete in a folder that match with some patterns.
+     *
      * @param folder folder where the contents are.
      * @param patterns patterns that identifies the contents to search.
      */
-    private static void deleteContentsFromFolder(File folder, final String...patterns) {
-        File[]  files = folder.listFiles();
+    private static void deleteContentsFromFolder(File folder, final String... patterns) {
+        File[] files = folder.listFiles();
 
-        if(files != null){
+        if (files != null) {
             for (File file : files) {
                 for (String pattern : patterns) {
-                    if(file.getName().matches(pattern)){
+                    if (file.getName().matches(pattern)) {
                         LOGGER.log(Level.FINE, "Deleting the temporary file {0}", file);
                         deleteWinstoneTempContents(file);
                     }
@@ -508,11 +511,11 @@ public class Main {
             LOGGER.log(Level.FINEST, "No file found at {0}, nothing to delete.", file);
             return;
         }
-        if(file.isDirectory()) {
+        if (file.isDirectory()) {
             File[] files = file.listFiles();
-            if(files!=null) {// be defensive
+            if (files != null) { // be defensive
                 for (File value : files) {
-                   deleteWinstoneTempContents(value);
+                    deleteWinstoneTempContents(value);
                 }
             }
         }
@@ -525,7 +528,8 @@ public class Main {
     private static class FileAndDescription {
         final File file;
         final String description;
-        public FileAndDescription(File file,String description) {
+
+        FileAndDescription(File file, String description) {
             this.file = file;
             this.description = description;
         }
@@ -539,7 +543,7 @@ public class Main {
      *
      * @return the File alongside with some description to help the user troubleshoot issues
      */
-    @SuppressFBWarnings(value = {"PATH_TRAVERSAL_IN"}, justification = "User provided values for running the program.")
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "User provided values for running the program.")
     private static FileAndDescription getHomeDir() {
         // check the system property for the home directory first
         for (String name : HOME_NAMES) {
@@ -569,19 +573,19 @@ public class Main {
                 // Hudson <1.42 used to prefer this before ~/.hudson, so
                 // check the existence and if it's there, use it.
                 // otherwise if this is a new installation, prefer ~/.hudson
-                return new FileAndDescription(ws,"getServletContext().getRealPath(\"/WEB-INF/workspace\")");
+                return new FileAndDescription(ws, "getServletContext().getRealPath(\"/WEB-INF/workspace\")");
         }
 */
 
         // if for some reason we can't put it within the webapp, use home directory.
-        File legacyHome = new File(new File(System.getProperty("user.home")),".hudson");
+        File legacyHome = new File(new File(System.getProperty("user.home")), ".hudson");
         if (legacyHome.exists()) {
-            return new FileAndDescription(legacyHome,"$user.home/.hudson"); // before rename, this is where it was stored
+            return new FileAndDescription(legacyHome, "$user.home/.hudson"); // before rename, this is where it was stored
         }
 
-        File newHome = new File(new File(System.getProperty("user.home")),".jenkins");
-        return new FileAndDescription(newHome,"$user.home/.jenkins");
+        File newHome = new File(new File(System.getProperty("user.home")), ".jenkins");
+        return new FileAndDescription(newHome, "$user.home/.jenkins");
     }
 
-    private static final String[] HOME_NAMES = {"JENKINS_HOME","HUDSON_HOME"};
+    private static final String[] HOME_NAMES = {"JENKINS_HOME", "HUDSON_HOME"};
 }

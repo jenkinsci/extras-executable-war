@@ -21,10 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 import edu.umd.cs.findbugs.annotations.NonNull;
-
-import sun.misc.Signal;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +30,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import sun.misc.Signal;
 
 /**
  * {@link OutputStream} that writes to a log file.
@@ -56,9 +55,9 @@ final class LogFileOutputStream extends FilterOutputStream {
     LogFileOutputStream(File file) throws FileNotFoundException {
         super(null);
         this.file = file;
-        out = new FileOutputStream(file,true);
+        out = new FileOutputStream(file, true);
 
-        if(File.pathSeparatorChar==':') {
+        if (File.pathSeparatorChar == ':') {
             Signal.handle(new Signal("ALRM"), signal -> {
                 try {
                     reopen();
@@ -72,7 +71,7 @@ final class LogFileOutputStream extends FilterOutputStream {
     public synchronized void reopen() throws IOException {
         out.close();
         out = NULL; // in case reopen fails, initialize with NULL first
-        out = new FileOutputStream(file,true);
+        out = new FileOutputStream(file, true);
     }
 
     @Override
@@ -102,7 +101,7 @@ final class LogFileOutputStream extends FilterOutputStream {
 
     @Override
     public String toString() {
-        return getClass().getName()+" -> "+file;
+        return getClass().getName() + " -> " + file;
     }
 
     /**
