@@ -62,12 +62,14 @@ public class Main {
 
     private static final int MINIMUM_JAVA_VERSION = 8;
     private static final int RECOMMENDED_JAVA_VERSION = 11;
+    private static final int MAXIMUM_JAVA_VERSION = 17;
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
-            new HashSet<>(Arrays.asList(MINIMUM_JAVA_VERSION, RECOMMENDED_JAVA_VERSION));
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_VERSION, RECOMMENDED_JAVA_VERSION, MAXIMUM_JAVA_VERSION));
     private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
     private static final int RECOMMENDED_JAVA_CLASS_VERSION = 55;
+    private static final int MAXIMUM_JAVA_CLASS_VERSION = 61;
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
-            new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, RECOMMENDED_JAVA_CLASS_VERSION));
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, RECOMMENDED_JAVA_CLASS_VERSION, MAXIMUM_JAVA_CLASS_VERSION));
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
