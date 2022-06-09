@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.jar.JarFile;
@@ -179,7 +180,9 @@ public class Main {
         return false;
     }
 
-    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "User provided values for running the program.")
+    @SuppressFBWarnings(
+            value = {"PATH_TRAVERSAL_IN", "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"},
+            justification = "User provided values for running the program and intentional propagation of reflection errors")
     private static void _main(String[] args) throws IllegalAccessException {
         //Allows to pass arguments through stdin to "hide" sensitive parameters like httpsKeyStorePassword
         //to achieve this use --paramsFromStdIn
@@ -468,7 +471,7 @@ public class Main {
     private static File extractFromJar(String resource, String fileName, String suffix, File directory) {
         URL res = Main.class.getResource(resource);
         if (res == null) {
-            throw new RuntimeException("Unable to find the resource: " + resource);
+            throw new MissingResourceException("Unable to find the resource: " + resource, Main.class.getName(), resource);
         }
 
         // put this jar in a file system so that we can load jars from there
