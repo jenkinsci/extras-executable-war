@@ -79,7 +79,6 @@
   <!-- TODO When Java 8 usage declines to a terminal level, this can be deleted. -->
   <build>
     <plugins>
-      <!-- TODO When the minimum Jenkins baseline is bumped past 2.357, this can be deleted. -->
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
