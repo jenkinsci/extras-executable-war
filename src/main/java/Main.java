@@ -61,16 +61,14 @@ import java.util.logging.Logger;
  */
 public class Main {
 
-    private static final int MINIMUM_JAVA_VERSION = 8;
-    private static final int RECOMMENDED_JAVA_VERSION = 11;
+    private static final int MINIMUM_JAVA_VERSION = 11;
     private static final int MAXIMUM_JAVA_VERSION = 17;
     private static final Set<Integer> SUPPORTED_JAVA_VERSIONS =
-            new HashSet<>(Arrays.asList(MINIMUM_JAVA_VERSION, RECOMMENDED_JAVA_VERSION, MAXIMUM_JAVA_VERSION));
-    private static final int MINIMUM_JAVA_CLASS_VERSION = 52;
-    private static final int RECOMMENDED_JAVA_CLASS_VERSION = 55;
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_VERSION, MAXIMUM_JAVA_VERSION));
+    private static final int MINIMUM_JAVA_CLASS_VERSION = 55;
     private static final int MAXIMUM_JAVA_CLASS_VERSION = 61;
     private static final Set<Integer> SUPPORTED_JAVA_CLASS_VERSIONS =
-            new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, RECOMMENDED_JAVA_CLASS_VERSION, MAXIMUM_JAVA_CLASS_VERSION));
+            new HashSet<>(Arrays.asList(MINIMUM_JAVA_CLASS_VERSION, MAXIMUM_JAVA_CLASS_VERSION));
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
@@ -125,17 +123,7 @@ public class Main {
     /*package*/ static void verifyJavaVersion(int javaClassVersion, boolean enableFutureJava) {
         final String displayVersion = String.format("%d.0", javaClassVersion);
         if (SUPPORTED_JAVA_CLASS_VERSIONS.contains(javaClassVersion)) {
-            if (javaClassVersion < RECOMMENDED_JAVA_CLASS_VERSION) {
-                LOGGER.log(
-                        Level.WARNING,
-                        String.format(
-                                "You are running Jenkins on Java %s, support for which will"
-                                    + " end on or after June 21, 2022. This is earlier than a previously announced date."
-                                    + " The Long Term Support (LTS) line of Jenkins will continue support till September 2022."
-                                    + " Please refer to the documentation for details on upgrading to Java 11:"
-                                    + " https://www.jenkins.io/redirect/upgrading-jenkins-java-version-8-to-11",
-                                System.getProperty("java.specification.version")));
-            }
+            // Great!
         } else if (javaClassVersion > MINIMUM_JAVA_CLASS_VERSION) {
             if (enableFutureJava) {
                 LOGGER.log(Level.WARNING,
