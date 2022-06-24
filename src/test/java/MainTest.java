@@ -10,22 +10,8 @@ public class MainTest {
 
     @Test
     public void shouldFailForOldJava() {
-        assertJavaCheckFails(51, false);
-        assertJavaCheckFails(51, true);
-    }
-
-    @Test
-    public void shouldBeOkForJava8() {
-        assertJavaCheckPasses(52, false);
-        assertJavaCheckPasses(52, true);
-    }
-
-    @Test
-    public void shouldFailForMidJavaVersionsIfNoFlag() {
-        assertJavaCheckFails(53, false);
-        assertJavaCheckFails(54, false);
-        assertJavaCheckPasses(53, true);
-        assertJavaCheckPasses(54, true);
+        assertJavaCheckFails(52, false);
+        assertJavaCheckFails(52, true);
     }
 
     @Test
@@ -36,11 +22,32 @@ public class MainTest {
     }
 
     @Test
-    public void shouldFailForNewJavaVersionsIfNoFlag() {
+    public void shouldFailForMidJavaVersionsIfNoFlag() {
         assertJavaCheckFails(56, false);
-        assertJavaCheckFails(57, false);
         assertJavaCheckPasses(56, true);
+        assertJavaCheckFails(57, false);
         assertJavaCheckPasses(57, true);
+        assertJavaCheckFails(58, false);
+        assertJavaCheckPasses(58, true);
+        assertJavaCheckFails(59, false);
+        assertJavaCheckPasses(59, true);
+        assertJavaCheckFails(60, false);
+        assertJavaCheckPasses(60, true);
+    }
+
+    @Test
+    @Issue("JENKINS-51805")
+    public void shouldBeOkForJava17() {
+        assertJavaCheckPasses(61, false);
+        assertJavaCheckPasses(61, true);
+    }
+
+    @Test
+    public void shouldFailForNewJavaVersionsIfNoFlag() {
+        assertJavaCheckFails(62, false);
+        assertJavaCheckPasses(62, true);
+        assertJavaCheckFails(63, false);
+        assertJavaCheckPasses(63, true);
     }
 
     public void assertJavaCheckFails(int classVersion, boolean enableFutureJava) {
